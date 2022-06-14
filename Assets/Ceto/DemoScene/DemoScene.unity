@@ -397,7 +397,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 191182, guid: 39e4ab1fc492fcd40ad361e0f8628aea, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 434062, guid: 39e4ab1fc492fcd40ad361e0f8628aea, type: 3}
       propertyPath: m_LocalPosition.x
@@ -442,7 +442,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 142306, guid: a33b9bbfb44f2614bba9580aab247272, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 424076, guid: a33b9bbfb44f2614bba9580aab247272, type: 3}
       propertyPath: m_LocalPosition.x
@@ -525,24 +525,107 @@ PrefabInstance:
       propertyPath: textureFoam
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
-      propertyPath: underwaterMode
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: spectrumType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: fourierSize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableReadBack
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: numberOfGrids
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableFoam
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableSlopes
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: gridScale
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: underwaterMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: depthMode
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: m_sun
       value: 
       objectReference: {fileID: 1516563656}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: doublePrecisionProjection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: tightProjectionFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableWarnings
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableInfo
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455084, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455084, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: resolution
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: blurMode
-      value: 2
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+--- !u!1 &1151313921 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 170234, guid: a0cc482d2da03784692568b56c77c234,
+    type: 3}
+  m_PrefabInstance: {fileID: 1064801266}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1151313928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151313921}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29100abfc632a2e49bb096d55d70a81d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  windSpeed: 10
 --- !u!1001 &1387102429
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -740,9 +823,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 164316, guid: 571539df0959ea64392ebdf5d89f0ed0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 170450, guid: 571539df0959ea64392ebdf5d89f0ed0, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 190714, guid: 571539df0959ea64392ebdf5d89f0ed0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 490678, guid: 571539df0959ea64392ebdf5d89f0ed0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -778,7 +869,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11426424, guid: 571539df0959ea64392ebdf5d89f0ed0, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11472188, guid: 571539df0959ea64392ebdf5d89f0ed0, type: 3}
       propertyPath: duration
