@@ -9,12 +9,15 @@ namespace Ceto
     public class TextFPS : MonoBehaviour
     {
         public Common.Unity.Utility.FPSCounter m_fps;
-        public Text text;
 
-        // Start is called before the first frame update
-        void Start()
+        private Text text;
+        private Button button;
+
+        private void Awake()
         {
-
+            text = GetComponent<Text>();
+            button = GetComponent<Button>();
+            button.onClick.AddListener(() => { text.enabled = !text.enabled; });
         }
 
         // Update is called once per frame
