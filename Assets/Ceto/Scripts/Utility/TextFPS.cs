@@ -20,7 +20,6 @@ namespace Ceto
             button.onClick.AddListener(() => { text.enabled = !text.enabled; });
         }
 
-        // Update is called once per frame
         void Update()
         {
             text.text = "FPS = " + m_fps.FrameRate.ToString("F2");

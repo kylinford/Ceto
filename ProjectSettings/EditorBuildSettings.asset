@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Ceto/DemoScene/Examples/OceanTrans.unity
+    guid: 6be76ac234f828f438c6a82128a75255
   m_configObjects: {}
