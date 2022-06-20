@@ -833,7 +833,12 @@ namespace Ceto
             data.cam.transform.rotation = rotation;
             data.cam.projectionMatrix = projection;
 
+            target.Save();
+
             data.cam.targetTexture = target;
+           
+            data.cam.targetTexture.Save();
+
             data.cam.RenderWithShader(oceanDepthSdr, "RenderType");
             data.cam.targetTexture = null;
    
