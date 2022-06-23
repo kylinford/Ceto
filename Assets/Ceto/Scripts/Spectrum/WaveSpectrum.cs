@@ -779,7 +779,14 @@ namespace Ceto
                         Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
                     }
 
-                    m_displacementBuffer.DisableSampling();
+					//Save
+					Debug.Log("Save");
+					m_displacementMaps[0].Save("0");
+					m_displacementMaps[1].Save("1");
+					m_displacementMaps[2].Save("2");
+					m_displacementMaps[3].Save("3");
+
+					m_displacementBuffer.DisableSampling();
 					m_displacementBuffer.BeenSampled = true;
 
 					//If this is a GPU buffer then read data back to CPU.

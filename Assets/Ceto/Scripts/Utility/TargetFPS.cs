@@ -7,7 +7,7 @@ public class TargetFPS : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Application.targetFrameRate = 300;
+        Application.targetFrameRate = 60;
     }
 
 }

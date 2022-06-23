@@ -23,6 +23,7 @@ namespace Ceto
         void Update()
         {
             text.text = "FPS = " + m_fps.FrameRate.ToString("F2");
+                //+ "\nsupportDX11=" + (SystemInfo.graphicsShaderLevel>=50 &&  SystemInfo.supportsComputeShaders);
                 //+ "\ntargetFrameRate = " + Application.targetFrameRate.ToString("F2");
             //text.text = "targetFrameRate = " + Application.targetFrameRate.ToString("F2");
         }

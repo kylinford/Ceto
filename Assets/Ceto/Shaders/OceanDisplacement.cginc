@@ -395,7 +395,6 @@ fixed SampleFoam(float2 uv)
 */
 void OceanPositionAndDisplacement(float4 uv, out float4 oceanPos, out float3 displacement)
 {
-
 	oceanPos = OceanPos(uv);
 	
 	displacement = float3(0,0,0);

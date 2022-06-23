@@ -20,8 +20,8 @@ Shader "Ceto/OceanTopSide_Transparent"
 		Blend SrcAlpha OneMinusSrcAlpha
 		
 		CGPROGRAM
-		#pragma surface OceanSurfTop OceanBRDF noforwardadd nolightmap keepalpha
-		#pragma vertex OceanVert
+		#pragma surface OceanSurfTop_PureColor OceanBRDF noforwardadd nolightmap keepalpha
+		#pragma vertex OceanVert_Flat
 		#pragma target 3.0
 		
 		#pragma multi_compile __ CETO_REFLECTION_ON
