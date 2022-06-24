@@ -59,7 +59,7 @@ namespace Ceto
 		/// <summary>
 		/// The length used for maps array: displacement, slope, foam maps array.
 		/// </summary>
-		public const int MAP_CACHE_LENGTH = 60;
+		public const int MAP_CACHE_LENGTH = 600;
 
 		/// <summary>
 		/// Maps
@@ -69,21 +69,9 @@ namespace Ceto
 		RenderTexture[] m_foamMaps = new RenderTexture[4];
 
 		/// <summary>
-		/// The array of m_displacementMaps, indexed by same time interval (SEC_INTERVAL)
-		/// </summary>
-		public IList<RenderTexture> DisplacementMapsCache
-        {
-            get
-            {
-				int currIndex = Time.frameCount % m_displacementMapsCache.Length;
-				return m_displacementMapsCache[currIndex];
-			}
-        }
-		/// <summary>
 		/// Displacement maps array, indexed 
 		/// </summary>
 		RenderTexture[][] m_displacementMapsCache = new RenderTexture[MAP_CACHE_LENGTH][];
-
 		int countCachedDisplacementMaps = 0;
 		public bool isReadyDisplacementMapsCache => countCachedDisplacementMaps == MAP_CACHE_LENGTH;
 
@@ -111,7 +99,7 @@ namespace Ceto
 			//Thread t = new Thread(new ThreadStart(GenerateDisplacementMapsArray));
 			//t.Start();
 			DateTime timeStart = DateTime.Now;
-			GenerateDisplacementMapsArray();
+			GenerateDisplacementMapsCache();
 			Debug.Log("Duration=" + (DateTime.Now - timeStart).TotalMilliseconds.ToString());
 		}
 
@@ -186,23 +174,32 @@ namespace Ceto
 		}
 
 
-		void GenerateDisplacementMapsArray()
+		void GenerateDisplacementMapsCache()
 		{
+			countCachedDisplacementMaps = 0;
+			m_displacementMapsCache = new RenderTexture[MAP_CACHE_LENGTH][];
 			for (int i = 0; i < MAP_CACHE_LENGTH; i++)
 			{
 				float time = SEC_INTERVAL * i;
-				RenderTexture[] curr = GenerateDisplacementMaps(time);
-				m_displacementMapsCache[i] = curr;
-                for (int j = 0; j < curr.Length; j++)
-                {
-					//curr[j].Save(curr[j].GetHashCode().ToString());
-					//Debug.Log("Saved");
-				}
-				
+				GenerateDisplacementMaps(time);
+				//Deep copy displacementMaps, then put them in m_displacementMapsCache
+				DeepCopyDisplacementMapsToCache(i);
 				countCachedDisplacementMaps++;
 			}
 		}
-		RenderTexture[] GenerateDisplacementMaps(float time)
+
+		void DeepCopyDisplacementMapsToCache(int index)
+        {
+			RenderTexture[] curr = new RenderTexture[m_displacementMaps.Length];
+            for (int i = 0; i < m_displacementMaps.Length; i++)
+            {
+				curr[i] = new RenderTexture(m_displacementMaps[i]);
+				Graphics.CopyTexture(m_displacementMaps[i], curr[i]);
+			}
+			m_displacementMapsCache[index] = curr;
+        }
+
+		void GenerateDisplacementMaps(float time)
 		{
 			//Need multiple render targets to run if running on GPU
 			/*
@@ -235,7 +232,7 @@ namespace Ceto
 			//If all the buffers are disabled then zero the textures
 			if (m_displacementBuffer.EnabledBuffers() == 0)
 			{
-				return null;
+				return;
 			}
 			else if (m_displacementBuffer.Done)
 			{
@@ -297,9 +294,7 @@ namespace Ceto
 				{
 					//ret[j].Save(j.ToString());
 				}
-				return m_displacementMaps;
 			}
-			return null;
 
 		}
 

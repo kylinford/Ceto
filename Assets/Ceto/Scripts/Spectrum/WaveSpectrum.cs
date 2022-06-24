@@ -537,12 +537,13 @@ namespace Ceto
 
                 //Update the scheduler so any tasks that have just finished are processed. 
                 UpdateSpectrumScheduler();
-				
-	            //Generate new data from the current time value. 
-				
+
+				//Generate new data from the current time value. 
+
+				//Debug.Log("time=" + time);
 	            GenerateDisplacement(time);
-	            GenerateSlopes(time);
-	            GenerateFoam(time);
+	            //GenerateSlopes(time);
+	            //GenerateFoam(time);
 
 			}
 			catch(Exception e)
@@ -682,18 +683,24 @@ namespace Ceto
 		void GenerateDisplacement(float time)
 		{
 			//Read from cache
-			if (cache.isReadyDisplacementMapsCache)
+			if (cache.isReadyDisplacementMapsCache && false)
 			{
-				//Debug.Log("Reading displacement from cache");
-				m_displacementMaps = cache.GetDisplacementMaps(time);
-				Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
-				Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
-				Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
-				Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
+				int numGrids = m_conditions[0].Key.NumGrids;
+
+				Debug.Log("Reading displacement from cache");
+				RenderTexture[] curr = cache.GetDisplacementMaps(time);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap0", curr[0]);
+				if (numGrids > 0)
+					Shader.SetGlobalTexture("Ceto_DisplacementMap1", curr[1]);
+				if (numGrids > 1)
+					Shader.SetGlobalTexture("Ceto_DisplacementMap2", curr[2]);
+				if (numGrids > 2)
+					Shader.SetGlobalTexture("Ceto_DisplacementMap3", curr[3]);
 
 				return;
 			}
 
+			Debug.Log("Calculatinng displacement");
 
 			//Need multiple render targets to run if running on GPU
 			if (!disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)
