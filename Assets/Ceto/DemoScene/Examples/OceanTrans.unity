@@ -5000,7 +5000,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: underwaterMode
@@ -5104,7 +5104,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: reflectionDistortion
@@ -7291,6 +7291,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1569387840 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 170234, guid: a0cc482d2da03784692568b56c77c234,
+    type: 3}
+  m_PrefabInstance: {fileID: 1064801266}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1569387841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569387840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da02d73bdbbbc33498e63a15375f894e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1588962075
 GameObject:
   m_ObjectHideFlags: 0

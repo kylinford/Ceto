@@ -161,6 +161,7 @@
     <Compile Include="Assets\Ceto\Scripts\Spectrum\CustomWaveSpectrumExample.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Unity\Wireframe.cs" />
     <Compile Include="Assets\Ceto\Scripts\Utility\ImageBlur.cs" />
+    <Compile Include="Assets\JW\WaveSpectrumCache.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Ceto\Shaders\WaveOverlay.shader" />

@@ -14,32 +14,31 @@ using Ceto.Common.Containers.Queues;
 namespace Ceto
 {
 
-    /// <summary>
-    /// The WaveSpectrum component is responsible for
-    /// creating the wave displacement, slope and foam textures.
-    /// A spectrum of frequencies is created based on the wind
-    /// speed, wind direction and wave age. This spectrum is then
-    /// transformed from the frequency domain to the spatial domain
-    /// using a Fast Fourier Transform algorithm. The wave displacements
-    /// can be transformed on the CPU using threading or on the GPU.
-    /// The slope and jacobians (foam) are always performed on the GPU.
-    /// </summary>
+	/// <summary>
+	/// The WaveSpectrum component is responsible for
+	/// creating the wave displacement, slope and foam textures.
+	/// A spectrum of frequencies is created based on the wind
+	/// speed, wind direction and wave age. This spectrum is then
+	/// transformed from the frequency domain to the spatial domain
+	/// using a Fast Fourier Transform algorithm. The wave displacements
+	/// can be transformed on the CPU using threading or on the GPU.
+	/// The slope and jacobians (foam) are always performed on the GPU.
+	/// </summary>
 	[AddComponentMenu("Ceto/Components/WaveSpectrum")]
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(Ocean))]
 	public class WaveSpectrum : OceanComponent
 	{
+		//These settings have been moved to the SpectrumTask script
+		//public const float WAVE_CM = 0.23f;	// Eq 59
+		//public const float WAVE_KM = 370.0f;	// Eq 59
 
-        //These settings have been moved to the SpectrumTask script
-        //public const float WAVE_CM = 0.23f;	// Eq 59
-        //public const float WAVE_KM = 370.0f;	// Eq 59
+		//These settings have been moved to the WaveSpectrumCondition script
+		//and are set by the parent PhillipsSpectrumCondition and UnifiedSpectrumCondition scripts.
+		//public static readonly Vector4 GRID_SIZES = new Vector4(1372, 392, 28, 4);
+		//public static readonly Vector4 CHOPPYNESS = new Vector4(2.3f, 2.1f, 1.6f, 0.9f);
 
-        //These settings have been moved to the WaveSpectrumCondition script
-        //and are set by the parent PhillipsSpectrumCondition and UnifiedSpectrumCondition scripts.
-        //public static readonly Vector4 GRID_SIZES = new Vector4(1372, 392, 28, 4);
-        //public static readonly Vector4 CHOPPYNESS = new Vector4(2.3f, 2.1f, 1.6f, 0.9f);
-
-        public const float MAX_CHOPPYNESS = 1.2f;
+		public const float MAX_CHOPPYNESS = 1.2f;
 		public const float MAX_FOAM_AMOUNT = 6.0f;
 		public const float MAX_FOAM_COVERAGE = 0.5f;
 		public const float MAX_WIND_SPEED = 30.0f;
@@ -55,51 +54,51 @@ namespace Ceto
 		public const float MAX_FOAM_SMOOTHING = 6.0f;
 		public const float MIN_FOAM_SMOOTHING = 1.0f;
 
-        /// <summary>
-        /// Helper struct to keep track of the
-        /// settings currently used for the buffers.
-        /// </summary>
-        struct BufferSettings
-        {
-            public bool beenCreated;
-            public bool isCpu;
-            public int size;
-        }
-		
+		/// <summary>
+		/// Helper struct to keep track of the
+		/// settings currently used for the buffers.
+		/// </summary>
+		struct BufferSettings
+		{
+			public bool beenCreated;
+			public bool isCpu;
+			public int size;
+		}
+
 		/// <summary>
 		/// This is used to determine the fourier transform size and if its ran on the CPU or GPU. 
 		/// </summary>
 		public FOURIER_SIZE fourierSize = FOURIER_SIZE.MEDIUM_64_CPU;
 
-        /// <summary>
-        /// What type of spectrum to use.
-        /// </summary>
-        public SPECTRUM_TYPE spectrumType = SPECTRUM_TYPE.UNIFIED;
+		/// <summary>
+		/// What type of spectrum to use.
+		/// </summary>
+		public SPECTRUM_TYPE spectrumType = SPECTRUM_TYPE.UNIFIED;
 
-        /// <summary>
-        /// Number of spectrum grids to use.
-        /// </summary>
-        [Range(1,4)]
-        public int numberOfGrids = 4;
+		/// <summary>
+		/// Number of spectrum grids to use.
+		/// </summary>
+		[Range(1, 4)]
+		public int numberOfGrids = 4;
 
-        /// <summary>
-        /// If displacements are done on the GPU disables the read back to the CPU.
-        /// This means there can be no height query's but fps will be better.
-        /// </summary>
-        public bool disableReadBack = true;
+		/// <summary>
+		/// If displacements are done on the GPU disables the read back to the CPU.
+		/// This means there can be no height query's but fps will be better.
+		/// </summary>
+		public bool disableReadBack = true;
 
-        /// <summary>
-        /// Set to true if you want to disable any of the buffers.
-        /// </summary>
-        public bool disableDisplacements;
-        public bool disableSlopes;
-        public bool disableFoam;
+		/// <summary>
+		/// Set to true if you want to disable any of the buffers.
+		/// </summary>
+		public bool disableDisplacements;
+		public bool disableSlopes;
+		public bool disableFoam;
 
 		/// <summary>
 		///  Should the white cap foam use the foam texture.
 		/// </summary>
 		public bool textureFoam = true;
-		
+
 		/// <summary>
 		/// Amount of displacement for each grid on the xz axis.
 		/// </summary>
@@ -118,16 +117,16 @@ namespace Ceto
 		[Range(0.0f, MAX_FOAM_COVERAGE)]
 		public float foamCoverage = 0.1f;
 
-        /// <summary>
-        /// A higher wind speed creates bigger waves.
-        /// </summary>
+		/// <summary>
+		/// A higher wind speed creates bigger waves.
+		/// </summary>
 		[Range(0.0f, MAX_WIND_SPEED)]
 		public float windSpeed = 8.0f;
 
-        /// <summary>
-        /// Controls how long the waves last for.
-        /// A higher values means the waves decay faster and are shorter lived. 
-        /// </summary>
+		/// <summary>
+		/// Controls how long the waves last for.
+		/// A higher values means the waves decay faster and are shorter lived. 
+		/// </summary>
 		[Range(MIN_WAVE_AGE, MAX_WAVE_AGE)]
 		public float waveAge = 0.64f;
 
@@ -158,94 +157,101 @@ namespace Ceto
 		/// Helps remove aliasing issues.
 		/// </summary>
 		[Range(MIN_SLOPE_SMOOTHING, MAX_SLOPE_SMOOTHING)]
-		/*public*/ float slopeSmoothing = 1.0f;
+		/*public*/
+		float slopeSmoothing = 1.0f;
 
 		/// <summary>
 		/// Scales the derivative when sampling the foam maps
 		/// Helps remove aliasing issues.
 		/// </summary>
 		[Range(MIN_FOAM_SMOOTHING, MAX_FOAM_SMOOTHING)]
-		/*public*/ float foamSmoothing = 2.0f;
-	
+		/*public*/
+		float foamSmoothing = 2.0f;
+
 		/// <summary>
 		/// The textures holding the heights for each grid size.
 		/// </summary>
 		public IList<RenderTexture> DisplacementMaps { get { return m_displacementMaps; } }
 		RenderTexture[] m_displacementMaps;
-		
+
 		/// <summary>
 		/// The textures holding the slope for each grid size.
 		/// </summary>
 		public IList<RenderTexture> SlopeMaps { get { return m_slopeMaps; } }
 		RenderTexture[] m_slopeMaps;
 
-        /// <summary>
-        /// The textures holding the foam for each grid size.
-        /// </summary>
+		/// <summary>
+		/// The textures holding the foam for each grid size.
+		/// </summary>
 		public IList<RenderTexture> FoamMaps { get { return m_foamMaps; } }
 		RenderTexture[] m_foamMaps;
 
-        /// <summary>
-        /// The maximum displacement on the x/z and y axis 
-        /// for the current wave conditions. 
-        /// </summary>
+		/// <summary>
+		/// The maximum displacement on the x/z and y axis 
+		/// for the current wave conditions. 
+		/// </summary>
 		public Vector2 MaxDisplacement { get; set; }
 
-        /// <summary>
-        /// Is true if the wind speed, wind direction or wave age has changed
-        /// and the new spectrum is still being created. The spectrum is created
-        /// on a separate thread and can take ~80ms at a fourier size of 64. 
-        /// </summary>
+		/// <summary>
+		/// Is true if the wind speed, wind direction or wave age has changed
+		/// and the new spectrum is still being created. The spectrum is created
+		/// on a separate thread and can take ~80ms at a fourier size of 64. 
+		/// </summary>
 		public bool IsCreatingNewCondition
-        {
-            get { return (m_conditions == null) ? false : m_conditions[1] != null; }
-        }
+		{
+			get { return (m_conditions == null) ? false : m_conditions[1] != null; }
+		}
 
-        /// <summary>
-        /// The materials used to copy the data created by the buffers into the textures.
-        /// The materials reorganise the data so it can be sampled more efficiently and 
-        /// allow for some post processing if needed. 
-        /// </summary>
-		Material m_slopeCopyMat, m_displacementCopyMat, m_foamCopyMat;
+		/// <summary>
+		/// The materials used to copy the data created by the buffers into the textures.
+		/// The materials reorganise the data so it can be sampled more efficiently and 
+		/// allow for some post processing if needed. 
+		/// </summary>
+		public Material m_slopeCopyMat { get; private set; }
+		public Material m_displacementCopyMat { get; private set; }
+		public Material m_foamCopyMat { get; private set; }
 
-        /// <summary>
-        /// Materials used to init the fourier data for the GPU buffers.
-        /// </summary>
-        Material m_slopeInitMat, m_displacementInitMat, m_foamInitMat;
+		/// <summary>
+		/// Materials used to init the fourier data for the GPU buffers.
+		/// </summary>
+		public Material m_slopeInitMat { get; private set; }
+		public Material m_displacementInitMat { get; private set; }
+		public Material m_foamInitMat { get; private set; }
 
-        /// <summary>
-        /// Gets the grid sizes.
-        /// </summary>
-        public Vector4 GridSizes { get { return m_gridSizes; } }
-        Vector4 m_gridSizes = Vector4.one;
+		/// <summary>
+		/// Gets the grid sizes.
+		/// </summary>
+		public Vector4 GridSizes { get { return m_gridSizes; } }
+		Vector4 m_gridSizes = Vector4.one;
 
-        /// <summary>
-        /// The choppyness as a vector, one for each grid.
-        /// </summary>
+		/// <summary>
+		/// The choppyness as a vector, one for each grid.
+		/// </summary>
 		public Vector4 Choppyness { get { return m_choppyness; } }
-        Vector4 m_choppyness = Vector4.one;
+		Vector4 m_choppyness = Vector4.one;
 
-        /// <summary>
-        /// Used to run the threaded tasks for generating the spectrum 
-        /// and the displacement FFT on the CPU.
-        /// </summary>
-		Scheduler m_scheduler;
+		/// <summary>
+		/// Used to run the threaded tasks for generating the spectrum 
+		/// and the displacement FFT on the CPU.
+		/// </summary>
+		public Scheduler m_scheduler { get; private set; }
 
-        /// <summary>
-        /// Holds the spectrum for the current conditions.
-        /// The array[0] is the current conditions and the
-        /// array[1] if not null is the new conditions that
-        /// are still being generated on a separate thread. 
-        /// </summary>
-		WaveSpectrumCondition[] m_conditions;
+		/// <summary>
+		/// Holds the spectrum for the current conditions.
+		/// The array[0] is the current conditions and the
+		/// array[1] if not null is the new conditions that
+		/// are still being generated on a separate thread. 
+		/// </summary>
+	  public	WaveSpectrumCondition[] m_conditions { get; private set; }
 
-        /// <summary>
-        /// The buffers that manage the transformation of the spectrum into
-        /// the displacement, slope or jacobian data. Can run on the CPU or GPU
-        /// depending on the parent class type. 
-        /// </summary>
-		WaveSpectrumBuffer m_displacementBuffer, m_slopeBuffer, m_jacobianBuffer;
-
+		/// <summary>
+		/// The buffers that manage the transformation of the spectrum into
+		/// the displacement, slope or jacobian data. Can run on the CPU or GPU
+		/// depending on the parent class type. 
+		/// </summary>
+		public WaveSpectrumBuffer m_displacementBuffer { get; private set; }
+		public WaveSpectrumBuffer m_slopeBuffer { get; private set; }
+		public WaveSpectrumBuffer m_jacobianBuffer { get; private set; }
 		/// <summary>
 		/// Used to find the max range of the displacements.
 		/// For larger fourier sizes this can take a while so 
@@ -319,8 +325,13 @@ namespace Ceto
 		[HideInInspector]
 		public ComputeShader readSdr;
 
-		void Start()
+		public WaveSpectrumCache cache { get; private set; }
+
+
+
+        void Start()
 		{
+			cache = GetComponent<WaveSpectrumCache>();
 
 			try
 			{
@@ -528,6 +539,7 @@ namespace Ceto
                 UpdateSpectrumScheduler();
 				
 	            //Generate new data from the current time value. 
+				
 	            GenerateDisplacement(time);
 	            GenerateSlopes(time);
 	            GenerateFoam(time);
@@ -667,11 +679,24 @@ namespace Ceto
 		/// Buffer 0 does the heights while buffer 1 and 2 does the xz displacement.
 		/// If buffer 0 is disable buffers 1 and 2 must also be disabled. 
 		/// </summary>
-        void GenerateDisplacement(float time)
+		void GenerateDisplacement(float time)
 		{
+			//Read from cache
+			if (cache.isReadyDisplacementMapsCache)
+			{
+				//Debug.Log("Reading displacement from cache");
+				m_displacementMaps = cache.GetDisplacementMaps(time);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
 
-            //Need multiple render targets to run if running on GPU
-            if (!disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)
+				return;
+			}
+
+
+			//Need multiple render targets to run if running on GPU
+			if (!disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)
             {
                 Ocean.LogWarning("Spectrum displacements needs at least SM3 to run on GPU. Disabling displacement.");
                 disableDisplacements = true;
@@ -780,12 +805,13 @@ namespace Ceto
                     }
 
 					//Save
+					/*
 					Debug.Log("Save");
 					m_displacementMaps[0].Save("0");
 					m_displacementMaps[1].Save("1");
 					m_displacementMaps[2].Save("2");
 					m_displacementMaps[3].Save("3");
-
+					*/
 					m_displacementBuffer.DisableSampling();
 					m_displacementBuffer.BeenSampled = true;
 
@@ -796,7 +822,7 @@ namespace Ceto
 					//Run the task to find the range of the data.
 					FindRanges();
 				}
-
+				
 			}
 		
 		}
@@ -1326,7 +1352,7 @@ namespace Ceto
 		/// Gets the size of the fourier transform and if the displacements
 		/// are run on the CPU or GPU.
 		/// </summary>
-		void GetFourierSize(out int size, out bool isCpu)
+		public void GetFourierSize(out int size, out bool isCpu)
 		{
 			
 			switch((int)fourierSize)
