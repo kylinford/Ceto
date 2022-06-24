@@ -542,8 +542,8 @@ namespace Ceto
 
 				//Debug.Log("time=" + time);
 	            GenerateDisplacement(time);
-	            //GenerateSlopes(time);
-	            //GenerateFoam(time);
+	            GenerateSlopes(time);
+	            GenerateFoam(time);
 
 			}
 			catch(Exception e)
@@ -603,9 +603,38 @@ namespace Ceto
         /// </summary>
         void GenerateSlopes(float time)
 		{
+			//Read from cache
+			if (cache.isMapsCacheReady)
+			{
+				int numGrids = m_conditions[0].Key.NumGrids;
 
-            //Need multiple render targets to run.
-            if (!disableSlopes && SystemInfo.graphicsShaderLevel < 30)
+				Debug.Log("Reading Slope from cache");
+				RenderTexture[] curr = cache.GetSlopeMaps(time);
+
+				//COPY GRIDS 1 and 2
+				if (numGrids > 0)
+				{
+					Shader.SetGlobalTexture("Ceto_SlopeMap0", curr[0]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+				}
+				//COPY GRIDS 3 and 4
+				if (numGrids > 2)
+				{
+					Shader.SetGlobalTexture("Ceto_SlopeMap1", curr[1]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+				}
+
+				return;
+			}
+
+			//Need multiple render targets to run.
+			if (!disableSlopes && SystemInfo.graphicsShaderLevel < 30)
             {
                 Ocean.LogWarning("Spectrum slopes needs at least SM3 to run. Disabling slopes.");
                 disableSlopes = true;
@@ -683,19 +712,50 @@ namespace Ceto
 		void GenerateDisplacement(float time)
 		{
 			//Read from cache
-			if (cache.isReadyDisplacementMapsCache && false)
+			if (cache.isMapsCacheReady)
 			{
 				int numGrids = m_conditions[0].Key.NumGrids;
 
 				Debug.Log("Reading displacement from cache");
 				RenderTexture[] curr = cache.GetDisplacementMaps(time);
-				Shader.SetGlobalTexture("Ceto_DisplacementMap0", curr[0]);
+
+				//COPY GRIDS 1
 				if (numGrids > 0)
-					Shader.SetGlobalTexture("Ceto_DisplacementMap1", curr[1]);
+				{
+					//If only 1 grids used use pass 4 as the packing is different.
+					Shader.SetGlobalTexture("Ceto_DisplacementMap0", curr[0]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+				}
+				//COPY GRIDS 2
 				if (numGrids > 1)
-					Shader.SetGlobalTexture("Ceto_DisplacementMap2", curr[2]);
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap1", curr[1]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+				}
+				//COPY GRIDS 3
 				if (numGrids > 2)
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap2", curr[2]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+				}
+				//COPY GRIDS 4
+				if (numGrids > 3)
+				{
 					Shader.SetGlobalTexture("Ceto_DisplacementMap3", curr[3]);
+				}
+				else
+				{
+					Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+				}
 
 				return;
 			}
@@ -933,8 +993,15 @@ namespace Ceto
 		/// </summary>
         void GenerateFoam(float time)
 		{
+			if (cache.isMapsCacheReady)
+			{
+				Debug.Log("Reading foam from cache");
+				RenderTexture[] curr = cache.GetFoamMaps(time);
+				Shader.SetGlobalTexture("Ceto_FoamMap0", curr[0]);
+				return;
+			}
 
-            Vector4 foamChoppyness = Choppyness;
+			Vector4 foamChoppyness = Choppyness;
             //foamChoppyness = m_conditions[0].Choppyness;
 
             //need multiple render targets to run.
