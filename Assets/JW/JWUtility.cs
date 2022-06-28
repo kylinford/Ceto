@@ -4,6 +4,19 @@ using UnityEngine;
 
 public static class JWUtility
 {
+    public static void Save(this Texture tex, string name)
+    {
+        if (tex == null)
+        {
+            Debug.LogWarning("[JWUtility.Save]Texture is null");
+            return;
+        }
+        Texture2D tex2d = tex as Texture2D;
+        byte[] bytes = tex2d.EncodeToPNG();
+        System.IO.File.WriteAllBytes("C:/Users/wangjiaqi.jacky/Downloads/Saved/" + name + ".png", bytes);
+        Object.Destroy(tex2d);
+    }
+
     public static void Save(this RenderTexture rt, string name)
     {
         if (rt == null)

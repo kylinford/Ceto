@@ -24,9 +24,21 @@ namespace Ceto
 		public Ocean ocean { get; private set; }
 		public WaveSpectrum waveSpectrum { get; private set; }
 
-		private int size = 64;
-		private bool isCpu = false;
+		public int size { get; private set; } = 64;
+		public bool isCpu { get; private set; } = false;
 
+		public WaveSpectrumCondition condition;
+
+		/// <summary>
+		/// Required shaders that should be bound to the script.
+		/// </summary>
+		[HideInInspector]
+		public Shader initSlopeSdr, initDisplacementSdr, initJacobianSdr, fourierSdr;
+		/// <summary>
+		/// Required shaders that should be bound to the script.
+		/// </summary>
+		[HideInInspector]
+		public Shader slopeCopySdr, displacementCopySdr, foamCopySdr;
 
 		/// <summary>
 		/// Time interval used for maps array: displacement, slope, foam maps array.
@@ -49,16 +61,22 @@ namespace Ceto
 		/// the displacement, slope or jacobian data. Can run on the CPU or GPU
 		/// depending on the parent class type. 
 		/// </summary>
-		/*
+		
 		public WaveSpectrumBuffer m_displacementBuffer { get; private set; }
 		public WaveSpectrumBuffer m_slopeBuffer { get; private set; }
 		public WaveSpectrumBuffer m_jacobianBuffer { get; private set; }
+		
+		/*
+		public WaveSpectrumBuffer m_displacementBuffer;
+		private WaveSpectrumBuffer m_slopeBuffer;
+		private WaveSpectrumBuffer m_jacobianBuffer;
 		*/
-		public WaveSpectrumBuffer m_displacementBuffer => waveSpectrum.m_displacementBuffer;
-		public WaveSpectrumBuffer m_slopeBuffer => waveSpectrum.m_slopeBuffer;
-		public WaveSpectrumBuffer m_jacobianBuffer => waveSpectrum.m_jacobianBuffer;
 
-
+		/// <summary>
+		/// Some settings for the current buffers.
+		/// </summary>
+		//public BufferSettings M_BufferSettings => m_bufferSettings;
+		private WaveSpectrum.BufferSettings m_bufferSettings = new WaveSpectrum.BufferSettings();
 		/// <summary>
 		/// The materials used to copy the data created by the buffers into the textures.
 		/// The materials reorganise the data so it can be sampled more efficiently and 
@@ -91,7 +109,7 @@ namespace Ceto
 
 		int countCachedMaps = 0;
 		public bool isMapsCacheReady => countCachedMaps == CACHE_SIZE;
-		public bool IsReady => shaderCache_Float.Count >= CACHE_SIZE;
+		public bool IsReady => shaderCache_Float.Count >= CACHE_SIZE && condition != null;
 		/*{
 			get
 			{
@@ -108,29 +126,62 @@ namespace Ceto
 		{
 			ocean = GetComponent<Ocean>();
 			waveSpectrum = GetComponent<WaveSpectrum>();
-
 		}
 
-		private IEnumerator Start()
+		private void Start()
 		{
-			m_slopeCopyMat = new Material(waveSpectrum.slopeCopySdr);
-			m_displacementCopyMat = new Material(waveSpectrum.displacementCopySdr);
-			m_foamCopyMat = new Material(waveSpectrum.foamCopySdr);
+            try
+            {
+				//Zero all textures
+				Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
+				Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
+				Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
+				Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
 
-			m_slopeInitMat = new Material(waveSpectrum.initSlopeSdr);
-			m_displacementInitMat = new Material(waveSpectrum.initDisplacementSdr);
-			m_foamInitMat = new Material(waveSpectrum.initJacobianSdr);
-			/*
-			CreateBuffers();
-			CreateRenderTextures();
-			*/
-			CreateRenderTextures();
-			yield return new WaitForEndOfFrame();
-			//Thread t = new Thread(new ThreadStart(GenerateDisplacementMapsArray));
-			//t.Start();
-			DateTime timeStart = DateTime.Now;
-			GenerateMapsCache();
-			Debug.Log("Duration=" + (DateTime.Now - timeStart).TotalMilliseconds.ToString());
+				m_slopeCopyMat = new Material(slopeCopySdr);
+				m_displacementCopyMat = new Material(displacementCopySdr);
+				m_foamCopyMat = new Material(foamCopySdr);
+
+				m_slopeInitMat = new Material(initSlopeSdr);
+				m_displacementInitMat = new Material(initDisplacementSdr);
+				m_foamInitMat = new Material(initJacobianSdr);
+
+				//m_scheduler = new Scheduler();
+
+				CreateBuffers();
+				CreateRenderTextures();
+				//CreateConditions();
+				condition = waveSpectrum.NewSpectrumCondition(
+					size,
+					waveSpectrum.windSpeed,
+					ocean.windDir,
+					waveSpectrum.waveAge
+					);
+				IThreadedTask task = condition.GetCreateSpectrumConditionTask();
+				task.Start();
+				task.Run();
+				task.End();
+				
+				//UpdateQueryScaling();
+			}
+			catch (Exception e)
+			{
+				Ocean.LogError(e.ToString());
+
+			}
+			GenerateCache();
+		}
+
+		void Update()
+		{
+			if (IsReady)
+			{
+				//waveSpectrum.Update_FromCache();
+				//ApplyGlobalProperties(Time.time);
+			}
 		}
 
 		int GetCacheIndex(float time)
@@ -152,7 +203,7 @@ namespace Ceto
 			shaderCache_Texture.Add(new Dictionary<string, Texture>());
 		}
 
-		public void SetGlobalFloat(int index, string propertyName, float value)
+		private void SetGlobalFloat(int index, string propertyName, float value)
 		{
 			if (index >= shaderCache_Float.Count)
             {
@@ -168,7 +219,7 @@ namespace Ceto
 				shaderCache_Float[index][propertyName] = value;
 			}
 		}
-		public void SetGlobalVector(int index, string propertyName, Vector4 value)
+		private void SetGlobalVector(int index, string propertyName, Vector4 value)
 		{
 			if (index >= shaderCache_Vector.Count)
 			{
@@ -184,7 +235,7 @@ namespace Ceto
 				shaderCache_Vector[index][propertyName] = value;
 			}
 		}
-		public void SetGlobalTexture(int index, string propertyName, Texture2D src)
+		private void SetGlobalTexture(int index, string propertyName, Texture2D src)
 		{
 			if (index >= shaderCache_Texture.Count)
 			{
@@ -204,7 +255,7 @@ namespace Ceto
 				shaderCache_Texture[index][propertyName] = value;
 			}
 		}
-		public void SetGlobalTexture(int index, string propertyName, RenderTexture src)
+		private void SetGlobalTexture(int index, string propertyName, RenderTexture src)
 		{
 			if (index >= shaderCache_Texture.Count)
 			{
@@ -214,25 +265,27 @@ namespace Ceto
 			//Deep copy
 			RenderTexture value = new RenderTexture(src);
 			Graphics.CopyTexture(src, value);
-			//value.Save(propertyName);
 
 			if (!shaderCache_Texture[index].ContainsKey(propertyName))
 			{
-				shaderCache_Texture[index].Add(propertyName, value);
+				shaderCache_Texture[index].Add(propertyName, null);
+
 			}
-			else
-			{
-				shaderCache_Texture[index][propertyName] = value;
-			}
+			shaderCache_Texture[index][propertyName] = value;
+
+			//string fileName = "SetGlobalTexture_" + index + "_" + propertyName;
+			//Debug.Log(fileName);
+			//(shaderCache_Texture[index][propertyName] as RenderTexture).Save(fileName);
 		}
 
 		public bool ApplyGlobalProperties(float time)
-        {
+		{
 			int index = GetIndex(time);
 			if (!IsReady)
-            {
+			{
 				return false;
-            }
+			}
+			/*
 			foreach (var data in shaderCache_Float[index])
 			{
 				Shader.SetGlobalFloat(data.Key, data.Value);
@@ -240,46 +293,142 @@ namespace Ceto
 			foreach (var data in shaderCache_Vector[index])
 			{
 				Shader.SetGlobalVector(data.Key, data.Value);
-			}
+			}*/
 			foreach (var data in shaderCache_Texture[index])
 			{
+				//Debug.Log(data.Key);
 				Shader.SetGlobalTexture(data.Key, data.Value);
 			}
 			return true;
 		}
+		public void SaveGlobalTextures(int index)
+		{
+			foreach (var data in shaderCache_Texture[index])
+			{
+				//Shader.SetGlobalTexture(data.Key, data.Value);
+				string fileName = index + "_" + data.Key;
+				//Debug.Log("Saving: " + fileName);
+				(data.Value as RenderTexture).Save(fileName);
+			}
+		}
+		public void SaveGlobalTextures(float time)
+		{
+			int index = GetIndex(time);
+			SaveGlobalTextures(index);
+		}
+		public void SaveGlobalTextures()
+        {
+            for (int i = 0; i < shaderCache_Texture.Count; i++)
+            {
+				SaveGlobalTextures(i);
+			}
+        }
 
-		public RenderTexture[] GetDisplacementMaps(float time)
+		private RenderTexture[] GetDisplacementMaps(float time)
 		{
 			return m_displacementMapsCache[GetCacheIndex(time)];
 		}
-		public RenderTexture[] GetSlopeMaps(float time)
+		private RenderTexture[] GetSlopeMaps(float time)
 		{
 			return m_slopeMapsCache[GetCacheIndex(time)];
 		}
-		public RenderTexture[] GetFoamMaps(float time)
+		private RenderTexture[] GetFoamMaps(float time)
 		{
 			return m_foamMapsCache[GetCacheIndex(time)];
 		}
 
-		/*
+		/// <summary>
+		/// Creates all the buffers and related data. 
+		/// If fourier settings have changed the buffers
+		/// are all released and recreated with new settings.
+		/// </summary>
 		void CreateBuffers()
 		{
+			int size;
+			bool isCpu;
 			waveSpectrum.GetFourierSize(out size, out isCpu);
+
+			if (m_bufferSettings.beenCreated)
+			{
+				//buffers have already been created.
+				//Check to see if settings have changed.
+
+				if (m_bufferSettings.size == size &&
+					m_bufferSettings.isCpu == isCpu)
+				{
+					//settings have not changed.
+					return;
+				}
+				else
+				{
+					//Process all tasks until scheduler is empty.
+					/*
+					while (m_scheduler.HasTasks())
+						UpdateSpectrumScheduler();
+					*/
+					//Settings changed and safe to recreate buffers.
+					//Clear everything and reset.
+					Release();
+					m_bufferSettings.beenCreated = false;
+				}
+			}
+
+			void Release()
+			{
+				if (m_displacementBuffer != null)
+				{
+					m_displacementBuffer.Release();
+					m_displacementBuffer = null;
+				}
+
+				if (m_slopeBuffer != null)
+				{
+					m_slopeBuffer.Release();
+					m_slopeBuffer = null;
+				}
+
+				if (m_jacobianBuffer != null)
+				{
+					m_jacobianBuffer.Release();
+					m_jacobianBuffer = null;
+				}
+
+				RTUtility.ReleaseAndDestroy(m_displacementMaps);
+				m_displacementMaps = null;
+
+				RTUtility.ReleaseAndDestroy(m_slopeMaps);
+				m_slopeMaps = null;
+
+				RTUtility.ReleaseAndDestroy(m_foamMaps);
+				m_foamMaps = null;
+
+			}
 
 			//Displacements can be carried out on the CPU or GPU.
 			//Only CPU displacements support height queries for buoyancy currently.
+			/*
 			if (isCpu)
-				m_displacementBuffer = new DisplacementBufferCPU(size, waveSpectrum.m_scheduler);
+				m_displacementBuffer = new DisplacementBufferCPU(size, m_scheduler);
 			else
-				m_displacementBuffer = new DisplacementBufferGPU(size, waveSpectrum.fourierSdr);
+				m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
+			*/
+			m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
 
-			m_slopeBuffer = new WaveSpectrumBufferGPU(size, waveSpectrum.fourierSdr, 2);
-			m_jacobianBuffer = new WaveSpectrumBufferGPU(size, waveSpectrum.fourierSdr, 3);
+			m_slopeBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 2);
+			m_jacobianBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 3);
 
+			//m_readBuffer = new ComputeBuffer(size * size, sizeof(float) * 3);
+
+			//m_conditions = new WaveSpectrumCondition[2];
 			m_displacementMaps = new RenderTexture[4];
 			m_slopeMaps = new RenderTexture[2];
 			m_foamMaps = new RenderTexture[1];
-		}*/
+
+			m_bufferSettings.beenCreated = true;
+			m_bufferSettings.size = size;
+			m_bufferSettings.isCpu = isCpu;
+
+		}
 
 		/// <summary>
 		/// Create all the textures need to hold the data.
@@ -333,37 +482,25 @@ namespace Ceto
 		/// Creates the spectrum for a given set of conditions. 
 		/// </summary>
 
-		void GenerateMapsCache()
+		void GenerateCache()
 		{
-			return;
+			//return;
 			countCachedMaps = 0;
-			GenerateOceanProperty();
+			//GenerateOceanProperty();
 			//Displacement
 			//m_displacementMapsCache = new RenderTexture[CACHE_SIZE][];
 			for (int i = 0; i < CACHE_SIZE; i++)
 			{
 				float time = SEC_INTERVAL * i;
-				GenerateDisplacementMaps(i, time);
-				GenerateSlopeMaps(i, time);
-				GenerateFoamMaps(i, time);
+				if (!waveSpectrum.disableDisplacements)
+					GenerateDisplacementMaps(i, time);
+				if (!waveSpectrum.disableSlopes)
+					GenerateSlopeMaps(i, time);
+				if (!waveSpectrum.disableFoam)
+					GenerateFoamMaps(i, time);
 				//DeepCopyMapsToCache(m_displacementMaps, out m_displacementMapsCache[i]);
 			}
-			//Slope
-			//m_slopeMapsCache = new RenderTexture[CACHE_SIZE][];
-			for (int i = 0; i < CACHE_SIZE; i++)
-			{
-				float time = SEC_INTERVAL * i;
-				//DeepCopyMapsToCache(m_slopeMaps, out m_slopeMapsCache[i]);
-			}
-			//Foam
-			//m_foamMapsCache = new RenderTexture[CACHE_SIZE][];
-			for (int i = 0; i < CACHE_SIZE; i++)
-			{
-				float time = SEC_INTERVAL * i;
-				//DeepCopyMapsToCache(m_foamMaps, out m_foamMapsCache[i]);
-				//countCachedMaps++;
-			}
-
+			//SaveGlobalTextures();
 		}
 
 		void DeepCopyMapsToCache(RenderTexture[] src, out RenderTexture[] dst)
@@ -381,7 +518,7 @@ namespace Ceto
 
 		void GenerateOceanProperty()
         {
-			int numGrids = waveSpectrum.m_conditions[0].Key.NumGrids;
+			int numGrids = condition.Key.NumGrids;
 
 			if (numGrids > 2)
 				Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
@@ -393,7 +530,7 @@ namespace Ceto
 			Shader.SetGlobalVector("Ceto_GridSizes", waveSpectrum.GridSizes);
 			Shader.SetGlobalVector("Ceto_GridScale", new Vector2(waveSpectrum.gridScale, waveSpectrum.gridScale));
 			Shader.SetGlobalVector("Ceto_Choppyness", waveSpectrum.Choppyness);
-			Shader.SetGlobalFloat("Ceto_MapSize", waveSpectrum.M_BufferSettings.size);
+			Shader.SetGlobalFloat("Ceto_MapSize", m_bufferSettings.size);
 			Shader.SetGlobalFloat("Ceto_WaveSmoothing", waveSpectrum.waveSmoothing);
 			Shader.SetGlobalFloat("Ceto_SlopeSmoothing", waveSpectrum.slopeSmoothing);
 			Shader.SetGlobalFloat("Ceto_FoamSmoothing", waveSpectrum.foamSmoothing);
@@ -408,31 +545,9 @@ namespace Ceto
 		/// </summary>
 		void GenerateDisplacementMaps(int index, float time)
 		{
-			//Need multiple render targets to run if running on GPU
-			if (!waveSpectrum.disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && m_displacementBuffer.IsGPU)
-			{
-				Ocean.LogWarning("Spectrum displacements needs at least SM3 to run on GPU. Disabling displacement.");
-				//disableDisplacements = true;
-			}
+			m_displacementBuffer.EnableBuffer(1);
+			m_displacementBuffer.EnableBuffer(2);
 
-			m_displacementBuffer.EnableBuffer(-1);
-
-			if (waveSpectrum.disableDisplacements)
-				m_displacementBuffer.DisableBuffer(-1);
-
-			if (!waveSpectrum.disableDisplacements && waveSpectrum.choppyness == 0.0f)
-			{
-				//If choppyness is 0 then there will be no xz displacement so disable buffers 1 and 2.
-				m_displacementBuffer.DisableBuffer(1);
-				m_displacementBuffer.DisableBuffer(2);
-			}
-
-			if (!waveSpectrum.disableDisplacements && waveSpectrum.choppyness > 0.0f)
-			{
-				//If choppyness is > 0 then there will be xz displacement so eanable buffers 1 and 2.
-				m_displacementBuffer.EnableBuffer(1);
-				m_displacementBuffer.EnableBuffer(2);
-			}
 			//If all the buffers are disabled then zero the textures
 			if (m_displacementBuffer.EnabledBuffers() == 0)
 			{
@@ -448,7 +563,7 @@ namespace Ceto
 			}
 			else if (m_displacementBuffer.Done)
 			{
-				int numGrids = waveSpectrum.m_conditions[0].Key.NumGrids;
+				int numGrids = condition.Key.NumGrids;
 
 				if (numGrids <= 2)
 					m_displacementBuffer.DisableBuffer(2);
@@ -461,7 +576,7 @@ namespace Ceto
 				{
 					m_displacementBuffer.InitMaterial = m_displacementInitMat;
 					m_displacementBuffer.InitPass = numGrids - 1;
-					m_displacementBuffer.Run(waveSpectrum.m_conditions[0], time);
+					m_displacementBuffer.Run(condition, time);
 				}
 
 				if (!m_displacementBuffer.BeenSampled)
@@ -528,11 +643,6 @@ namespace Ceto
 
 					m_displacementBuffer.DisableSampling();
 					m_displacementBuffer.BeenSampled = true;
-
-				}
-				for (int j = 0; j < m_displacementMaps.Length; j++)
-				{
-					//ret[j].Save(j.ToString());
 				}
 			}
 
@@ -563,7 +673,7 @@ namespace Ceto
 			}
 			else
 			{
-				int numGrids = waveSpectrum.m_conditions[0].Key.NumGrids;
+				int numGrids = condition.Key.NumGrids;
 
 				if (numGrids <= 2)
 					m_slopeBuffer.DisableBuffer(1);
@@ -574,7 +684,7 @@ namespace Ceto
 				{
 					m_slopeBuffer.InitMaterial = m_slopeInitMat;
 					m_slopeBuffer.InitPass = numGrids - 1;
-					m_slopeBuffer.Run(waveSpectrum.m_conditions[0], time);
+					m_slopeBuffer.Run(condition, time);
 				}
 
 				if (!m_slopeBuffer.BeenSampled)
@@ -642,7 +752,7 @@ namespace Ceto
 			if (waveSpectrum.disableFoam 
 				|| waveSpectrum.foamAmount == 0.0f 
 				|| sqrMag == 0.0f 
-				|| !waveSpectrum.m_conditions[0].SupportsJacobians)
+				|| !condition.SupportsJacobians)
 			{
 				m_jacobianBuffer.DisableBuffer(-1);
 			}
@@ -656,7 +766,7 @@ namespace Ceto
 			else
 			{
 
-				int numGrids = waveSpectrum.m_conditions[0].Key.NumGrids;
+				int numGrids = condition.Key.NumGrids;
 
 				if (numGrids == 1)
 				{
@@ -675,7 +785,7 @@ namespace Ceto
 					m_foamInitMat.SetFloat("Ceto_FoamAmount", waveSpectrum.foamAmount);
 					m_jacobianBuffer.InitMaterial = m_foamInitMat;
 					m_jacobianBuffer.InitPass = numGrids - 1;
-					m_jacobianBuffer.Run(waveSpectrum.m_conditions[0], time);
+					m_jacobianBuffer.Run(condition, time);
 				}
 
 				if (!m_jacobianBuffer.BeenSampled)

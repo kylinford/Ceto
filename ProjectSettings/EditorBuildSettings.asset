@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Ceto/DemoScene/Island/DemoForCeto.unity
+    path: Assets/Ceto/DemoScene/Island/DemoIsland.unity
     guid: 31dc7716432f34945be305135a99600f
   m_configObjects: {}
