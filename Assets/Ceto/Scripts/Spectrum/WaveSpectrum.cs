@@ -352,10 +352,42 @@ namespace Ceto
 
 		private void Start_FromCache()
         {
+
+			m_slopeCopyMat = new Material(slopeCopySdr);
+			m_displacementCopyMat = new Material(displacementCopySdr);
+			m_foamCopyMat = new Material(foamCopySdr);
+
+			m_slopeInitMat = new Material(initSlopeSdr);
+			m_displacementInitMat = new Material(initDisplacementSdr);
+			m_foamInitMat = new Material(initJacobianSdr);
+
+			m_scheduler = new Scheduler();
+
 			//Copy from cache
+
+			//If the settings have changed create a new buffers or conditions. 
+			//CreateBuffers();
+			m_displacementBuffer = cache.m_displacementBuffer;
+			m_slopeBuffer = cache.m_slopeBuffer;
+			m_jacobianBuffer = cache.m_jacobianBuffer;
+
+			m_displacementMaps = new RenderTexture[4];
+			m_slopeMaps = new RenderTexture[2];
+			m_foamMaps = new RenderTexture[1];
+			
+			m_bufferSettings.beenCreated = true;
+			m_bufferSettings.size = cache.size;
+			m_bufferSettings.isCpu = cache.isCpu;
+
+			CreateRenderTextures();
+			
+			//CreateConditions();
 			m_conditions = new WaveSpectrumCondition[2];
 			m_conditions[0] = cache.condition;
-			m_scheduler = new Scheduler();
+			IThreadedTask task = m_conditions[0].GetCreateSpectrumConditionTask();
+			task.Start();
+			task.Run();
+			task.End();
 
 		}
 		private void Start_Realtime()
@@ -521,14 +553,9 @@ namespace Ceto
 
 		void Update()
 		{
-			Update_RealtimeByCacheInfo();
-			return;
-			if (cache.enabled && false)
+			if (cache.enabled)
             {
-				if (cache.IsReady)
-                {
-					Update_FromCache();
-				}
+				Update_FromCache();
 			}
 			else
             {
@@ -538,82 +565,15 @@ namespace Ceto
 
 		public void Update_FromCache()
         {
-			Debug.Log("Update_FromCache");
-			try
+			//Debug.Log("Update_FromCache");
+			if (m_conditions == null || m_conditions[0] == null)
 			{
-				/*
-				m_slopeCopyMat = cache.m_slopeCopyMat;
-				m_displacementCopyMat = cache.m_displacementCopyMat;
-				m_foamCopyMat = cache.m_foamCopyMat;
-
-				m_slopeInitMat = cache.m_slopeInitMat;
-				m_displacementInitMat = cache.m_slopeInitMat;
-				m_foamInitMat = cache.m_foamInitMat;
-				*/
-				gridScale = Mathf.Clamp(gridScale, MIN_GRID_SCALE, MAX_GRID_SCALE);
-				windSpeed = Mathf.Clamp(windSpeed, 0.0f, MAX_WIND_SPEED);
-				waveAge = Mathf.Clamp(waveAge, MIN_WAVE_AGE, MAX_WAVE_AGE);
-				waveSpeed = Mathf.Clamp(waveSpeed, 0.0f, MAX_WAVE_SPEED);
-				foamAmount = Mathf.Clamp(foamAmount, 0.0f, MAX_FOAM_AMOUNT);
-				foamCoverage = Mathf.Clamp(foamCoverage, 0.0f, MAX_FOAM_COVERAGE);
-				waveSmoothing = Mathf.Clamp(waveSmoothing, MIN_WAVE_SMOOTHING, MAX_WAVE_SMOOTHING);
-				slopeSmoothing = Mathf.Clamp(slopeSmoothing, MIN_SLOPE_SMOOTHING, MAX_SLOPE_SMOOTHING);
-				foamSmoothing = Mathf.Clamp(foamSmoothing, MIN_FOAM_SMOOTHING, MAX_FOAM_SMOOTHING);
-				numberOfGrids = Mathf.Clamp(numberOfGrids, 1, 4);
-
-				//The time value used to create the waves
-				float time = m_ocean.OceanTime.Now * waveSpeed;
-
-				//If the settings have changed create a new buffers or conditions. 
-				//CreateBuffers();
-				//CreateRenderTextures();
-				//CreateConditions();
-				m_conditions = new WaveSpectrumCondition[2];
-				m_conditions[0] = cache.condition;
-				m_scheduler = new Scheduler();
-
-				int numGrids = cache.condition.Key.NumGrids;
-
-				if (numGrids > 2)
-					Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
-				else
-					Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
-
-				Shader.SetGlobalVector("Ceto_GridSizes", GridSizes);
-				Shader.SetGlobalVector("Ceto_GridScale", new Vector2(gridScale, gridScale));
-				Shader.SetGlobalVector("Ceto_Choppyness", Choppyness);
-				Shader.SetGlobalFloat("Ceto_MapSize", m_bufferSettings.size);
-				Shader.SetGlobalFloat("Ceto_WaveSmoothing", waveSmoothing);
-				Shader.SetGlobalFloat("Ceto_SlopeSmoothing", slopeSmoothing);
-				Shader.SetGlobalFloat("Ceto_FoamSmoothing", foamSmoothing);
-				Shader.SetGlobalFloat("Ceto_TextureWaveFoam", (textureFoam) ? 1.0f : 0.0f);
-
-				UpdateQueryScaling();
-
-				//Update the scheduler so any tasks that have just finished are processed. 
-				//UpdateSpectrumScheduler();
-
-				cache.ApplyGlobalProperties(time);
-				
-			}
-			catch (Exception e)
-			{
-				Ocean.LogError(e.ToString());
-				WasError = true;
-				enabled = false;
-			}
-
-		}
-
-		private void Update_RealtimeByCacheInfo()
-		{
-			Debug.Log("Update_RealtimeByCacheInfo");
-			if (!cache.IsReady)
-            {
 				return;
-            }
+			}
+
 			try
 			{
+				//Clamp
 				gridScale = Mathf.Clamp(gridScale, MIN_GRID_SCALE, MAX_GRID_SCALE);
 				windSpeed = Mathf.Clamp(windSpeed, 0.0f, MAX_WIND_SPEED);
 				waveAge = Mathf.Clamp(waveAge, MIN_WAVE_AGE, MAX_WAVE_AGE);
@@ -628,32 +588,14 @@ namespace Ceto
 				//The time value used to create the waves
 				float time = m_ocean.OceanTime.Now * waveSpeed;
 
-				//If the settings have changed create a new buffers or conditions. 
-				//CreateBuffers();
-				m_displacementBuffer = cache.m_displacementBuffer;
-				m_slopeBuffer = cache.m_slopeBuffer;
-				m_jacobianBuffer = cache.m_jacobianBuffer;
-				m_displacementMaps = new RenderTexture[4];
-				m_slopeMaps = new RenderTexture[2];
-				m_foamMaps = new RenderTexture[1];
-				m_bufferSettings.beenCreated = true;
-				m_bufferSettings.size = cache.size;
-				m_bufferSettings.isCpu = cache.isCpu;
-
-				//CreateRenderTextures();
-				//CreateConditions();
-				m_conditions = new WaveSpectrumCondition[2];
-				m_conditions[0] = cache.condition;
-
-				int numGrids = m_conditions[0].Key.NumGrids;
-
+				//numGrids
+				int numGrids = cache.condition.Key.NumGrids;
 				if (numGrids > 2)
 					Shader.EnableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
 				else
 					Shader.DisableKeyword("CETO_USE_4_SPECTRUM_GRIDS");
 
-				UpdateQueryScaling();
-
+				//Shader lobal values
 				Shader.SetGlobalVector("Ceto_GridSizes", GridSizes);
 				Shader.SetGlobalVector("Ceto_GridScale", new Vector2(gridScale, gridScale));
 				Shader.SetGlobalVector("Ceto_Choppyness", Choppyness);
@@ -663,16 +605,16 @@ namespace Ceto
 				Shader.SetGlobalFloat("Ceto_FoamSmoothing", foamSmoothing);
 				Shader.SetGlobalFloat("Ceto_TextureWaveFoam", (textureFoam) ? 1.0f : 0.0f);
 
-				//Update the scheduler so any tasks that have just finished are processed. 
-				//UpdateSpectrumScheduler();
+				//UpdateQueryScaling
+				UpdateQueryScaling();
 
 				//Generate new data from the current time value. 
-
-				//Debug.Log("time=" + time);
 				GenerateDisplacement(time);
 				GenerateSlopes(time);
 				GenerateFoam(time);
 
+				//Apply cache values
+				cache.ApplyGlobalProperties(time);
 			}
 			catch (Exception e)
 			{
@@ -1296,8 +1238,6 @@ namespace Ceto
 
         void CreateMap(ref RenderTexture map, string name, RenderTextureFormat format, int size, int ansio)
         {
-
-
             if (map != null)
             {
                 if (!map.IsCreated()) map.Create();

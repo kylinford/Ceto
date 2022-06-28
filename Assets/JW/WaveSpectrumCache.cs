@@ -96,9 +96,9 @@ namespace Ceto
 		/// <summary>
 		/// Maps
 		/// </summary>
-		RenderTexture[] m_displacementMaps = new RenderTexture[4];
-		RenderTexture[] m_slopeMaps = new RenderTexture[2];
-		RenderTexture[] m_foamMaps = new RenderTexture[1];
+		public RenderTexture[] m_displacementMaps { get; private set; } = new RenderTexture[4];
+		public RenderTexture[] m_slopeMaps { get; private set; } = new RenderTexture[2];
+		public RenderTexture[] m_foamMaps { get; private set; } = new RenderTexture[1];
 
 		/// <summary>
 		/// Maps cache
