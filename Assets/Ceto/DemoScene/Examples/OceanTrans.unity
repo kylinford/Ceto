@@ -4994,13 +4994,17 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableSlopes
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: edgeFade
       value: 0.91
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: underwaterMode
@@ -5104,7 +5108,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: reflectionDistortion

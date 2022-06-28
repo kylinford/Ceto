@@ -162,38 +162,139 @@
     <Compile Include="Assets\Ceto\Scripts\Spectrum\CustomWaveSpectrumExample.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Unity\Wireframe.cs" />
     <Compile Include="Assets\Ceto\Scripts\Utility\ImageBlur.cs" />
+    <Compile Include="Assets\JW\WaveSpectrumShaderValueCache.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\ImageEffectBase.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\ContrastStretchEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\WaterBase.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\NoiseEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\BlurEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\MotionBlur.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\PlanarReflection.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\Displace.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\MeshContainer.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\GlowEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Basic)\Sources\Scripts\WaterSimple.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\ImageEffects.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\SSAOEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\SpecularLighting.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Character Controllers\Sources\Scripts\MouseLook.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Sources\Scripts\Water.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\ColorCorrectionEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\GrayscaleEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\SepiaToneEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\TwirlEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\VortexEffect.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\GerstnerDisplace.cs" />
+    <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\WaterTile.cs" />
+    <Compile Include="Assets\JW\ChangeSkyBox.cs" />
   </ItemGroup>
   <ItemGroup>
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Tonemapper.shader" />
      <None Include="Assets\Ceto\Shaders\WaveOverlay.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\GlobalFog.shader" />
      <None Include="Assets\Ceto\Shaders\NormalFade.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\VortexEffect.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\NoiseAndGrain.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\DLAA.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\frag_ao.cginc" />
      <None Include="Assets\Ceto\Shaders\InitDisplacement.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\GlowEffectDownsample.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\FXAAPreset3.shader" />
      <None Include="Assets\Ceto\Shaders\Fourier.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\CameraMotionBlurDX11.shader" />
      <None Include="Assets\Ceto\Shaders\OceanBottom.shader" />
      <None Include="Assets\Ceto\Shaders\UnderWaterPostEffect.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\VignettingShader.shader" />
      <None Include="Assets\Ceto\Shaders\CopyDepth.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ColorCorrectionCurves.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\MultiPassHollywoodFlares.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\SSAOShader.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ColorCorrectionCurvesSimple.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\Blend.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\SSAA.shader" />
      <None Include="Assets\JW\NewUnlitShader.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\SunShaftsComposite.shader" />
      <None Include="Assets\Ceto\Shaders\Read.compute" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ConvertDepth.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Shaders\WaterInclude.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\TwirlEffect.shader" />
      <None Include="Assets\Ceto\Shaders\OceanDepth.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Contrast Stretch\Apply.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Contrast Stretch\Adaptation.shader" />
      <None Include="Assets\Ceto\Shaders\FoamCopy.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\LensFlareCreate.shader" />
      <None Include="Assets\Ceto\Shaders\OceanBRDF.cginc" />
      <None Include="Assets\Ceto\Shaders\OceanShadowCasterBody.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\CameraMotionBlur.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ScreenSpaceAmbientObscurance.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\CreaseApply.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\FXAA3Console.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ColorCorrectionSelective.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\RadialBlur.shader" />
      <None Include="Assets\Ceto\Shaders\SlopeCopy.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\VignetteShader.shader" />
      <None Include="Assets\Ceto\Shaders\OceanDisplacement.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\MotionBlurClear.shader" />
      <None Include="Assets\Ceto\Manual.txt" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\GlowCompose.shader" />
      <None Include="Assets\Ceto\Shaders\BlurEffectConeTaps.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\SepiaToneEffect.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ColorCorrection3DLut.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\SimpleClear.shader" />
      <None Include="Assets\Ceto\Shaders\OceanUnderSide_Opaque.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ContrastComposite.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Shaders\FX-Water4.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Contrast Stretch\MinMaxReduction.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\BlurEffectConeTaps.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\Bokeh34.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ColorCorrectionEffect.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\FisheyeShader.shader" />
      <None Include="Assets\Ceto\Shaders\OceanMasking.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\BlendOneOne.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\BrightPassFilter.shader" />
      <None Include="Assets\Ceto\Shaders\OceanUnderWater.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\MobileBloom.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\BlendForBloom.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\DepthOfField34.shader" />
      <None Include="Assets\Ceto\Shaders\OceanMaskBody.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\DepthOfFieldDX11.shader" />
      <None Include="Assets\Ceto\Shaders\OceanMaskFlipped.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\SeparableBlurPlus.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\MotionBlur.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\SeparableBlur.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\MobileBlur.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\BrightPassFilter2.shader" />
      <None Include="Assets\Ceto\Shaders\OceanUnderSide_Transparent.shader" />
+     <None Include="Assets\Pirates Island\_origin\Tools\Blend SM2.shader" />
      <None Include="Assets\Ceto\Shaders\OceanShaderHeader.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Shaders\FX-SimpleWater4.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\PrepareSunShaftsBlur.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ShowAlphaChannel.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\GrayscaleEffect.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\ChromaticAberrationShader.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\NoiseAndGrainDX11.shader" />
+     <None Include="Assets\Pirates Island\_origin\Tools\Blend SM3.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\SeparableWeightedBlurDof34.shader" />
      <None Include="Assets\Ceto\Shaders\DisplacementCopy.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\GlowConeTap.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Sources\Shaders\FX-Water.shader" />
      <None Include="Assets\Ceto\Shaders\OceanSurfaceShaderBody.cginc" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\BlendModesOverlay.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\DepthOfFieldScatter.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\EdgeDetectNormals.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\NoiseEffectShaderRGB.shader" />
      <None Include="Assets\Ceto\Shaders\InitJacobians.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Water (Basic)\Sources\Shaders\FX-Water Simple.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\FXAA2.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\NoiseEffectShaderYUV.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Contrast Stretch\Luminance.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\BlurAndFlares.shader" />
      <None Include="Assets\Ceto\Shaders\OceanTopSide_Transparent.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\NFAA.shader" />
      <None Include="Assets\Ceto\Version.txt" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\FXAAPreset2.shader" />
      <None Include="Assets\Ceto\Shaders\OceanMask.shader" />
+     <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_DepthOfField\TiltShiftHdrLensBlur.shader" />
      <None Include="Assets\Ceto\Shaders\InitSlope.shader" />
      <None Include="Assets\Ceto\Shaders\OceanTopSide_Opaque.shader" />
     <Reference Include="UnityEngine">
@@ -739,17 +840,20 @@
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.1.6f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Timeline">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="UnityEngine.UI.csproj">
+      <Project>{2C2EA7F5-C5C7-88B5-9CB7-A47EA5E19CE8}</Project>
+      <Name>UnityEngine.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.Timeline.csproj">
+      <Project>{E28C3BD6-36A8-8339-98C3-63E0FCF8C9D5}</Project>
+      <Name>Unity.Timeline</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.TextMeshPro.csproj">
+      <Project>{D08A9C92-88DA-BC8B-8140-DA8FC8DE1EF5}</Project>
+      <Name>Unity.TextMeshPro</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

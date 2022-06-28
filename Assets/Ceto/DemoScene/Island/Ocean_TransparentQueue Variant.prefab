@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4453130651542604282
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 170234, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 435478, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: textureFoam
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: windSpeed
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: numberOfGrids
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: waveSpeed
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: fourierSize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableReadBack
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: gridScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: underwaterMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: depthMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_sun
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableWarnings
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: disableInfo
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: doublePrecisionProjection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: tightProjectionFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: specularIntensity
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: foamIntensity
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455084, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: resolution
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: reflectionDistortion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a0cc482d2da03784692568b56c77c234, type: 3}

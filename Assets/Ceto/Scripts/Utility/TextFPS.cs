@@ -18,6 +18,7 @@ namespace Ceto
             text = GetComponent<Text>();
             button = GetComponent<Button>();
             button.onClick.AddListener(() => { text.enabled = !text.enabled; });
+            Application.targetFrameRate = 100;
         }
 
         void Update()
