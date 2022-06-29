@@ -186,6 +186,7 @@
     <Compile Include="Assets\Ceto\Scripts\Spectrum\CustomWaveSpectrumExample.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Unity\Wireframe.cs" />
     <Compile Include="Assets\Ceto\Scripts\Utility\ImageBlur.cs" />
+    <Compile Include="Assets\JW\DemoCameraAnimation.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Tonemapper.shader" />

@@ -172,19 +172,19 @@ namespace Ceto
 		/// The textures holding the heights for each grid size.
 		/// </summary>
 		public IList<RenderTexture> DisplacementMaps { get { return m_displacementMaps; } }
-		RenderTexture[] m_displacementMaps;
+		RenderTexture[] m_displacementMaps => cache.m_displacementMaps;
 
 		/// <summary>
 		/// The textures holding the slope for each grid size.
 		/// </summary>
 		public IList<RenderTexture> SlopeMaps { get { return m_slopeMaps; } }
-		RenderTexture[] m_slopeMaps;
+		RenderTexture[] m_slopeMaps => cache.m_slopeMaps;
 
 		/// <summary>
 		/// The textures holding the foam for each grid size.
 		/// </summary>
 		public IList<RenderTexture> FoamMaps { get { return m_foamMaps; } }
-		RenderTexture[] m_foamMaps;
+		RenderTexture[] m_foamMaps => cache.m_foamMaps;
 
 		/// <summary>
 		/// The maximum displacement on the x/z and y axis 
@@ -255,9 +255,9 @@ namespace Ceto
 		public WaveSpectrumBuffer m_slopeBuffer { get; private set; }
 		public WaveSpectrumBuffer m_jacobianBuffer { get; private set; }
 		*/
-		private WaveSpectrumBuffer m_displacementBuffer;
-		private WaveSpectrumBuffer m_slopeBuffer;
-		private WaveSpectrumBuffer m_jacobianBuffer;
+		private WaveSpectrumBuffer m_displacementBuffer => cache.m_displacementBuffer;
+		private WaveSpectrumBuffer m_slopeBuffer => cache.m_slopeBuffer;
+		private WaveSpectrumBuffer m_jacobianBuffer => cache.m_jacobianBuffer;
 
 		/// <summary>
 		/// Used to find the max range of the displacements.
@@ -280,7 +280,7 @@ namespace Ceto
 		/// Some settings for the current buffers.
 		/// </summary>
 		//public BufferSettings M_BufferSettings => m_bufferSettings;
-		private BufferSettings m_bufferSettings = new BufferSettings();
+		private BufferSettings m_bufferSettings => cache.m_bufferSettings; // new BufferSettings();
 
 		/// <summary>
 		/// Cache the conditions as they can take a while to create.
@@ -341,7 +341,7 @@ namespace Ceto
 			if (cache.enabled)
 			{
 				yield return new WaitUntil(() => cache.IsReady);
-				Debug.Log("yield start");
+				//Debug.Log("yield start");
 				Start_FromCache();
 			}
 			else
@@ -367,18 +367,19 @@ namespace Ceto
 
 			//If the settings have changed create a new buffers or conditions. 
 			//CreateBuffers();
+			/*
 			m_displacementBuffer = cache.m_displacementBuffer;
 			m_slopeBuffer = cache.m_slopeBuffer;
 			m_jacobianBuffer = cache.m_jacobianBuffer;
-
-			m_displacementMaps = new RenderTexture[4];
-			m_slopeMaps = new RenderTexture[2];
-			m_foamMaps = new RenderTexture[1];
+			
+			m_displacementMaps = cache.m_displacementMaps;
+			m_slopeMaps = cache.m_slopeMaps;
+			m_foamMaps = cache.m_foamMaps;
 			
 			m_bufferSettings.beenCreated = true;
 			m_bufferSettings.size = cache.size;
 			m_bufferSettings.isCpu = cache.isCpu;
-
+			*/
 			CreateRenderTextures();
 			
 			//CreateConditions();
@@ -488,6 +489,7 @@ namespace Ceto
         /// </summary>
         void Release()
         {
+			/*
             if (m_displacementBuffer != null)
             {
                 m_displacementBuffer.Release();
@@ -548,7 +550,7 @@ namespace Ceto
 
             RTUtility.ReleaseAndDestroy(m_foamMaps);
             m_foamMaps = null;
-
+			*/
         }
 
 		void Update()
@@ -586,7 +588,7 @@ namespace Ceto
 				numberOfGrids = Mathf.Clamp(numberOfGrids, 1, 4);
 
 				//The time value used to create the waves
-				float time = m_ocean.OceanTime.Now * waveSpeed;
+				float time = m_ocean.OceanTime.Now;// * waveSpeed;
 
 				//numGrids
 				int numGrids = cache.condition.Key.NumGrids;
@@ -608,13 +610,17 @@ namespace Ceto
 				//UpdateQueryScaling
 				UpdateQueryScaling();
 
-				//Generate new data from the current time value. 
-				GenerateDisplacement(time);
-				GenerateSlopes(time);
-				GenerateFoam(time);
-
 				//Apply cache values
-				cache.ApplyGlobalProperties(time);
+				//cache.GenerateByCacheRead(time);
+				cache.GenerateByBufferRun(time);
+
+				//Generate new data from the current time value. 
+				//GenerateDisplacement(time);
+				//GenerateSlopes(time);
+				//GenerateFoam(time);
+
+				//Run the task to find the range of the data.
+				//FindRanges();
 			}
 			catch (Exception e)
 			{
@@ -645,8 +651,8 @@ namespace Ceto
 				float time = m_ocean.OceanTime.Now * waveSpeed;
 
 				//If the settings have changed create a new buffers or conditions. 
-				CreateBuffers();
-				CreateRenderTextures();
+				//CreateBuffers();
+				//CreateRenderTextures();
 				CreateConditions();
 
 				int numGrids = m_conditions[0].Key.NumGrids;
@@ -900,7 +906,6 @@ namespace Ceto
 				if (numGrids <= 2)
 					m_slopeBuffer.DisableBuffer(1);
 
-				//Real time calculation
 				//If the buffers has been run and this is the same time value as
 				//last used then there is no need to run again.
 				if (!m_slopeBuffer.HasRun || m_slopeBuffer.TimeValue != time)
@@ -1154,6 +1159,11 @@ namespace Ceto
         /// If fourier settings have changed the buffers
         /// are all released and recreated with new settings.
         /// </summary>
+		void CreateBuffer()
+        {
+
+        }
+		/*
         void CreateBuffers()
         {
             int size;
@@ -1208,7 +1218,7 @@ namespace Ceto
             m_bufferSettings.isCpu = isCpu;
 
         }
-		
+		*/
 		/// <summary>
 		/// Create all the textures need to hold the data.
 		/// </summary>

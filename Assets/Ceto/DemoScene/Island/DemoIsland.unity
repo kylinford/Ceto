@@ -136,6 +136,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Text
       objectReference: {fileID: 0}
+    - target: {fileID: 972152392618704369, guid: 62086972c74351f47affbf0751f358a2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 972152392618704370, guid: 62086972c74351f47affbf0751f358a2,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -707,7 +712,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: windSpeed
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: foamAmount
@@ -759,7 +764,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: specularIntensity
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: foamTexture0.scrollSpeed
@@ -775,7 +780,7 @@ PrefabInstance:
       objectReference: {fileID: 620287040}
     - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: foamIntensity
-      value: 1.2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: foamTexture0.scale.x
@@ -793,9 +798,21 @@ PrefabInstance:
       propertyPath: foamTexture1.scale.y
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: tightProjectionFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: doublePrecisionProjection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: specularRoughness
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 11455084, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: resolution
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: reflectionMask.m_Bits
@@ -947,6 +964,7 @@ GameObject:
   - component: {fileID: 1919763648}
   - component: {fileID: 1919763647}
   - component: {fileID: 1919763650}
+  - component: {fileID: 1919763651}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -961,7 +979,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1919763646}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1919763648
 Camera:
   m_ObjectHideFlags: 0
@@ -985,8 +1003,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 20
-  far clip plane: 8000
+  near clip plane: 27
+  far clip plane: 5000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -1012,13 +1030,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1919763646}
-  m_LocalRotation: {x: -0.12552835, y: -0.38734847, z: 0.053316433, w: -0.9117901}
-  m_LocalPosition: {x: 185.47931, y: 75.2982, z: 218.79848}
+  m_LocalRotation: {x: -0.12290655, y: -0.4487822, z: 0.062459085, w: -0.8829425}
+  m_LocalPosition: {x: 247.88, y: 45.52, z: 293.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 15.849, y: 53.887, z: 0.001}
 --- !u!114 &1919763650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1034,3 +1052,15 @@ MonoBehaviour:
   skyboxes:
   - {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 2100000, guid: 3cb91c8e009655540879e1ea9eef9471, type: 2}
+--- !u!114 &1919763651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919763646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6f3f28b7b0d244fa6000567cfb425a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

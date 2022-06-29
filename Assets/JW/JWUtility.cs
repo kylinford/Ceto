@@ -13,7 +13,7 @@ public static class JWUtility
         }
         Texture2D tex2d = tex as Texture2D;
         byte[] bytes = tex2d.EncodeToPNG();
-        System.IO.File.WriteAllBytes("C:/Users/wangjiaqi.jacky/Downloads/Saved/" + name + ".png", bytes);
+        bytes.SaveBytes("C:/Users/wangjiaqi.jacky/Downloads/Saved/" + name + ".png");
         Object.Destroy(tex2d);
     }
 
@@ -26,8 +26,14 @@ public static class JWUtility
         }
         Texture2D tex2d = rt.toTexture2D();
         byte[] bytes = tex2d.EncodeToPNG();
-        System.IO.File.WriteAllBytes("C:/Users/wangjiaqi.jacky/Downloads/Saved/" + name + ".png", bytes);
+        bytes.SaveBytes("C:/Users/wangjiaqi.jacky/Downloads/Saved/" + name + ".png");
         Object.Destroy(tex2d);
+    }
+
+    private static void SaveBytes(this byte[] bytes, string dir)
+    {
+        Debug.Log("SaveBytes: " + dir);
+        System.IO.File.WriteAllBytes(dir, bytes);
     }
 
     public static Texture2D toTexture2D(this RenderTexture rTex)
