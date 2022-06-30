@@ -5,11 +5,10 @@ using Ceto;
 
 public class WaveSpectrumCache : MonoBehaviour
 {
-	public WaveSpectrum waveSpectrum => GetComponent<WaveSpectrum>();
-	public Ocean ocean => GetComponent<Ocean>();
-
+	/// <summary>
+	/// Tells if this component has finished start function
+	/// </summary>
 	public bool finishedStart { get; private set; } = false;
-
 	/// <summary>
 	/// Time interval used for maps array: displacement, slope, foam maps array.
 	/// </summary>
@@ -25,25 +24,22 @@ public class WaveSpectrumCache : MonoBehaviour
 	RenderTexture[][] m_slopeMapsCache = new RenderTexture[CACHE_SIZE][];
 	RenderTexture[][] m_foamMapsCache = new RenderTexture[CACHE_SIZE][];
 
+	/// <summary>
+	/// Property references to waveSpectrum components
+	/// </summary>
+	public WaveSpectrum waveSpectrum => GetComponent<WaveSpectrum>();
 	public WaveSpectrumBuffer M_DisplacementBuffer => waveSpectrum.M_DisplacementBuffer;
 	public WaveSpectrumBuffer M_SlopeBuffer => waveSpectrum.M_SlopeBuffer;
 	public WaveSpectrumBuffer M_JacobianBuffer => waveSpectrum.M_JacobianBuffer;
-
 	public Material M_SlopeInitMat => waveSpectrum.M_SlopeInitMat;
 	public Material M_DisplacementInitMat => waveSpectrum.M_DisplacementInitMat;
 	public Material M_FoamInitMat => waveSpectrum.M_FoamInitMat;
-
-
 	public Material M_SlopeCopyMat => waveSpectrum.M_SlopeCopyMat;
 	public Material M_DisplacementCopyMat => waveSpectrum.M_DisplacementCopyMat;
 	public Material M_FoamCopyMat => waveSpectrum.M_FoamCopyMat;
-
 	public WaveSpectrumCondition[] M_Conditions => waveSpectrum.M_Conditions;
 	public WaveSpectrumCondition condition => M_Conditions[0];
-
 	public WaveSpectrum.BufferSettings M_BufferSettings => waveSpectrum.M_BufferSettings;
-
-	private float time => ocean.OceanTime.Now * waveSpectrum.waveSpeed;
 
     private IEnumerator Start()
     {
@@ -163,7 +159,6 @@ public class WaveSpectrumCache : MonoBehaviour
 		if (!waveSpectrum.disableDisplacements && SystemInfo.graphicsShaderLevel < 30 && M_DisplacementBuffer.IsGPU)
 		{
 			Ocean.LogWarning("Spectrum displacements needs at least SM3 to run on GPU. Disabling displacement.");
-			//disableDisplacements = true;
 		}
 
 		M_DisplacementBuffer.EnableBuffer(-1);
@@ -188,10 +183,6 @@ public class WaveSpectrumCache : MonoBehaviour
 		//If all the buffers are disabled then zero the textures
 		if (M_DisplacementBuffer.EnabledBuffers() == 0)
 		{
-			//Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
-			//Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
-			//Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
-			//Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
 			Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][0]);
 			Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][1]);
 			Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][2]);
@@ -228,29 +219,20 @@ public class WaveSpectrumCache : MonoBehaviour
 				{
 					//If only 1 grids used use pass 4 as the packing is different.
 					Graphics.Blit(null, m_displacementMapsCache[index][0], M_DisplacementCopyMat, (numGrids == 1) ? 4 : 0);
-					//m_displacementMapsCache[index][0].Save(index + "_m_displacementMapsCache");
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap0", m_displacementMaps[0]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap0", "Displacement", m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
 				}
 				else
 				{
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
 					Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][0]);
-
 				}
 
 				//COPY GRIDS 2
 				if (numGrids > 1)
 				{
 					Graphics.Blit(null, m_displacementMapsCache[index][1], M_DisplacementCopyMat, 1);
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap1", m_displacementMaps[1]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap1", "Displacement", m_displacementCopyMat, 1);
+
 				}
 				else
 				{
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
 					Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][1]);
 				}
 
@@ -260,13 +242,9 @@ public class WaveSpectrumCache : MonoBehaviour
 				if (numGrids > 2)
 				{
 					Graphics.Blit(null, m_displacementMapsCache[index][2], M_DisplacementCopyMat, 2);
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap2", m_displacementMaps[2]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap2", "Displacement", m_displacementCopyMat, 2);
 				}
 				else
 				{
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
 					Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][2]);
 				}
 
@@ -274,13 +252,9 @@ public class WaveSpectrumCache : MonoBehaviour
 				if (numGrids > 3)
 				{
 					Graphics.Blit(null, m_displacementMapsCache[index][3], M_DisplacementCopyMat, 3);
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap3", m_displacementMaps[2]);
-					//SetGlobalTexture(index, "Ceto_DisplacementMap3", "Displacement", m_displacementCopyMat, 3);
 				}
 				else
 				{
-					//Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
 					Graphics.Blit(Texture2D.blackTexture, m_displacementMapsCache[index][3]);
 				}
 
@@ -300,7 +274,6 @@ public class WaveSpectrumCache : MonoBehaviour
 		if (!waveSpectrum.disableSlopes && SystemInfo.graphicsShaderLevel < 30)
 		{
 			Ocean.LogWarning("Spectrum slopes needs at least SM3 to run. Disabling slopes.");
-			//disableSlopes = true;
 		}
 
 		if (waveSpectrum.disableSlopes)
@@ -339,14 +312,9 @@ public class WaveSpectrumCache : MonoBehaviour
 				{
 					M_SlopeCopyMat.SetTexture("Ceto_SlopeBuffer", M_SlopeBuffer.GetTexture(0));
 					Graphics.Blit(null, m_slopeMapsCache[index][0], M_SlopeCopyMat, 0);
-					//m_slopeMaps[0].Save("Slope0");
-					//Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);
-					//SetGlobalTexture(index, "Ceto_SlopeMap0", m_slopeMaps[0]);
-					//SetGlobalTexture(index, "Ceto_SlopeMap0", "Slope", m_slopeCopyMat, 0);
 				}
 				else
 				{
-					//Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
 					Graphics.Blit(Texture2D.blackTexture, m_slopeMapsCache[index][0]);
 				}
 
@@ -355,14 +323,9 @@ public class WaveSpectrumCache : MonoBehaviour
 				{
 					M_SlopeCopyMat.SetTexture("Ceto_SlopeBuffer", M_SlopeBuffer.GetTexture(1));
 					Graphics.Blit(null, m_slopeMapsCache[index][1], M_SlopeCopyMat, 0);
-					//m_slopeMaps[0].Save("Slope1");
-					//Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMaps[1]);
-					//SetGlobalTexture(index, "Ceto_SlopeMap1", m_slopeMaps[1]);
-					//SetGlobalTexture(index, "Ceto_SlopeMap1", "Slope", m_slopeCopyMat, 0);
 				}
 				else
 				{
-					//Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
 					Graphics.Blit(Texture2D.blackTexture, m_slopeMapsCache[index][1]);
 				}
 
@@ -380,14 +343,12 @@ public class WaveSpectrumCache : MonoBehaviour
 	void GenerateFoamMaps(int index, float time)
 	{
 
-		Vector4 foamChoppyness = waveSpectrum.Choppyness;
-		//foamChoppyness = m_conditions[0].Choppyness;
+		Vector4 foamChoppyness = M_Conditions[0].Choppyness;
 
 		//need multiple render targets to run.
 		if (!waveSpectrum.disableFoam && SystemInfo.graphicsShaderLevel < 30)
 		{
 			Ocean.LogWarning("Spectrum foam needs at least SM3 to run. Disabling foam.");
-			//disableFoam = true;
 		}
 
 		float sqrMag = foamChoppyness.sqrMagnitude;
@@ -402,13 +363,10 @@ public class WaveSpectrumCache : MonoBehaviour
 		//If all buffers disable zero textures.
 		if (M_JacobianBuffer.EnabledBuffers() == 0)
 		{
-			//Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
 			Graphics.Blit(Texture2D.blackTexture, m_foamMapsCache[index][0]);
-
 		}
 		else
 		{
-
 			int numGrids = condition.Key.NumGrids;
 
 			if (numGrids == 1)
@@ -443,11 +401,7 @@ public class WaveSpectrumCache : MonoBehaviour
 				M_FoamCopyMat.SetVector("Ceto_FoamChoppyness", foamChoppyness);
 				M_FoamCopyMat.SetFloat("Ceto_FoamCoverage", waveSpectrum.foamCoverage);
 
-				//Graphics.Blit(null, m_foamMaps[0], m_foamCopyMat, numGrids - 1);
 				Graphics.Blit(null, m_foamMapsCache[index][0], M_FoamCopyMat, numGrids - 1);
-				//Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMaps[0]);
-				//SetGlobalTexture(index, "Ceto_FoamMap0", m_foamMaps[0]);
-				//SetGlobalTexture(index, "Ceto_FoamMap0", "Foam", m_foamCopyMat, numGrids - 1);
 
 				M_JacobianBuffer.DisableSampling();
 				M_JacobianBuffer.BeenSampled = true;
