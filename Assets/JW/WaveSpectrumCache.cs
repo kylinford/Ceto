@@ -48,7 +48,6 @@ public class WaveSpectrumCache : MonoBehaviour
     private IEnumerator Start()
     {
 		yield return new WaitUntil(() => waveSpectrum.M_Conditions != null);
-		Debug.Log(1);
 		CreateBuffers();
 		CreateRenderTextures();
 		GenerateAllMaps();
