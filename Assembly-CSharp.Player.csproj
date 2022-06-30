@@ -118,6 +118,7 @@
     <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\MeshContainer.cs" />
     <Compile Include="Assets\Ceto\Scripts\Ocean\IProjection.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Threading\Tasks\TaskListener.cs" />
+    <Compile Include="Assets\JW\DemoCameraAnimation.cs" />
     <Compile Include="Assets\JW\ChangeSkyBox.cs" />
     <Compile Include="Assets\Ceto\Scripts\Ocean\Querys\CoroutineWaveQueryTask.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Unity\ExtendedFind.cs" />
@@ -186,7 +187,6 @@
     <Compile Include="Assets\Ceto\Scripts\Spectrum\CustomWaveSpectrumExample.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Unity\Wireframe.cs" />
     <Compile Include="Assets\Ceto\Scripts\Utility\ImageBlur.cs" />
-    <Compile Include="Assets\JW\DemoCameraAnimation.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Tonemapper.shader" />
@@ -194,6 +194,7 @@
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\GlobalFog.shader" />
      <None Include="Assets\Ceto\Shaders\NormalFade.shader" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\VortexEffect.shader" />
+     <None Include="Assets\JW\WaveSpectrumCache.txt" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\NoiseAndGrain.shader" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\DLAA.shader" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\frag_ao.cginc" />
@@ -287,6 +288,7 @@
      <None Include="Assets\Pirates Island\Standard Assets\Water (Basic)\Sources\Shaders\FX-Water Simple.shader" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_Antialiasing\FXAA2.shader" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\NoiseEffectShaderYUV.shader" />
+     <None Include="Assets\JW\WaveSpectrumEdited.txt" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\Contrast Stretch\Luminance.shader" />
      <None Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\_Sources\Shaders\_BloomAndFlares\BlurAndFlares.shader" />
      <None Include="Assets\Ceto\Shaders\OceanTopSide_Transparent.shader" />
