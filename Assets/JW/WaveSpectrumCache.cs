@@ -47,21 +47,22 @@ namespace Ceto
 		/// <summary>
 		/// The length used for maps array: displacement, slope, foam maps array.
 		/// </summary>
-		public const int CACHE_SIZE = 100;
+		public const int CACHE_SIZE = 200;
 
 		/// <summary>
 		/// Shader value caches
 		/// </summary>
 		public List<Dictionary<string, float>> shaderCache_Float { get; private set; } = new List<Dictionary<string, float>>();
 		public List<Dictionary<string, Vector4>> shaderCache_Vector { get; private set; } = new List<Dictionary<string, Vector4>>();
-		public List<Dictionary<string, Texture>> shaderCache_Texture { get; private set; } = new List<Dictionary<string, Texture>>();
+		public List<Dictionary<string, RenderTexture>> shaderCache_Texture { get; private set; } = new List<Dictionary<string, RenderTexture>>(CACHE_SIZE);
+		public List<Dictionary<string, RenderTexture>> shaderCache_TextureByFrame { get; private set; } = new List<Dictionary<string, RenderTexture>>();
 
 		/// <summary>
 		/// The buffers that manage the transformation of the spectrum into
 		/// the displacement, slope or jacobian data. Can run on the CPU or GPU
 		/// depending on the parent class type. 
 		/// </summary>
-		
+
 		public WaveSpectrumBuffer m_displacementBuffer { get; private set; }
 		public WaveSpectrumBuffer m_slopeBuffer { get; private set; }
 		public WaveSpectrumBuffer m_jacobianBuffer { get; private set; }
@@ -109,7 +110,9 @@ namespace Ceto
 
 
 		int countCachedMaps = 0;
-		public bool isMapsCacheReady => countCachedMaps == CACHE_SIZE;
+        internal bool finishedStart = false;
+
+        public bool isMapsCacheReady => countCachedMaps == CACHE_SIZE;
 		public bool IsReady => shaderCache_Float.Count >= CACHE_SIZE && condition != null;
 		/*{
 			get
@@ -166,8 +169,8 @@ namespace Ceto
 				task.Run();
 				task.End();
 
-				GenerateAllMaps();
 
+				finishedStart = true;
 				//UpdateQueryScaling();
 			}
 			catch (Exception e)
@@ -175,6 +178,8 @@ namespace Ceto
 				Ocean.LogError(e.ToString());
 
 			}
+			//yield return new WaitForSeconds(1);
+			GenerateAllMaps();
 		}
 
 		void Update()
@@ -184,6 +189,14 @@ namespace Ceto
 				//waveSpectrum.Update_FromCache();
 				//ApplyGlobalProperties(Time.time);
 			}
+		}
+		void CacheCurrFrameMaps(string key, RenderTexture value)
+        {
+			shaderCache_TextureByFrame.Add(new Dictionary<string, RenderTexture>());
+			int index = shaderCache_TextureByFrame.Count - 1;
+			RenderTexture rt = new RenderTexture(value);
+			Graphics.CopyTexture(value, rt);
+			shaderCache_TextureByFrame[index].Add(key, rt);
 		}
 
 		/// <summary>
@@ -198,7 +211,7 @@ namespace Ceto
 			//m_displacementMapsCache = new RenderTexture[CACHE_SIZE][];
 			for (int i = 0; i < CACHE_SIZE; i++)
 			{
-				float time = SEC_INTERVAL * i;
+				float time = SEC_INTERVAL * (float)i;
 				if (!waveSpectrum.disableDisplacements)
 					GenerateDisplacementMaps(i, time);
 				if (!waveSpectrum.disableSlopes)
@@ -210,88 +223,35 @@ namespace Ceto
 			//SaveGlobalTextures();
 		}
 
-		public bool GenerateByCacheRead(float time)
+		public void GenerateByCacheRead(float time)
 		{
 			int index = GetIndex(time);
+			/*
 			if (!IsReady)
 			{
-				return false;
+				return;
 			}
+			*/
 			if (condition == null)
             {
 				Debug.Log("Condition null");
-				return false;
+				return;
             }
-			/*
-			foreach (var data in shaderCache_Float[index])
-			{
-				Shader.SetGlobalFloat(data.Key, data.Value);
-			}
-			foreach (var data in shaderCache_Vector[index])
-			{
-				Shader.SetGlobalVector(data.Key, data.Value);
-			}*/
-
-			//Debug.Log(data.Key);
-
 			
-			return true;
+			Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMapsCache[index][0]);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMapsCache[index][1]);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMapsCache[index][2]);
+			Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMapsCache[index][3]);
+			Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMapsCache[index][0]);
+			Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMapsCache[index][1]);
+			Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMapsCache[index][0]);
 
-			foreach (var data in shaderCache_Texture[index])
-			{
-				
-				switch (data.Key)
-				{
-					case "Ceto_DisplacementMap0":
-						m_displacementMaps[0] = data.Value as RenderTexture;
-						Shader.SetGlobalTexture("Ceto_DisplacementMap0", data.Value);
-						break;
-					case "Ceto_DisplacementMap1":
-						m_displacementMaps[1] = data.Value as RenderTexture;
-						Shader.SetGlobalTexture("Ceto_DisplacementMap1", data.Value);
-						break;
-					case "Ceto_DisplacementMap2":
-						m_displacementMaps[2] = data.Value as RenderTexture;
-						Shader.SetGlobalTexture("Ceto_DisplacementMap2", data.Value);
-						break;
-					case "Ceto_DisplacementMap3":
-						m_displacementMaps[3] = data.Value as RenderTexture;
-						Shader.SetGlobalTexture("Ceto_DisplacementMap3", data.Value);
-						break;
-
-					case "Ceto_SlopeMap0":
-						m_slopeMaps[0] = data.Value as RenderTexture;
-						m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(0));
-						Graphics.Blit(null, m_slopeMaps[0], m_slopeCopyMat, 0);
-						Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);
-						//Shader.SetGlobalTexture("Ceto_SlopeMap0", data.Value);
-						break;
-					case "Ceto_SlopeMap1":
-						m_slopeMaps[1] = data.Value as RenderTexture;
-						m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(1));
-						Graphics.Blit(null, m_slopeMaps[1], m_slopeCopyMat, 0); 
-						Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMaps[1]);
-						//Shader.SetGlobalTexture("Ceto_SlopeMap1", data.Value);
-						break;
-
-					case "Ceto_FoamMap0":
-						m_foamMaps[0] = data.Value as RenderTexture;
-						Shader.SetGlobalTexture("Ceto_FoamMap0", data.Value);
-						break;
-
-					default:
-						break;
-				}
-				
-				//Shader.SetGlobalTexture(data.Key, data.Value);
-			}
-			
-			return true;
 		}
 
 		public void GenerateByBufferRun(float time)
         {
 			int numGrids = waveSpectrum.numberOfGrids;
+			int index = GetIndex(time);
 
 			//Displacement
 			m_displacementBuffer.DisableSampling();
@@ -319,8 +279,6 @@ namespace Ceto
 			m_slopeBuffer.InitPass = numGrids - 1;
 			m_slopeBuffer.Run(condition, time);
 			m_slopeBuffer.EnableSampling();
-			//Shader.SetGlobalTexture("Ceto_SlopeMap0", shaderCache_Texture[index]["Ceto_SlopeMap0"]);
-			//Shader.SetGlobalTexture("Ceto_SlopeMap1", shaderCache_Texture[index]["Ceto_SlopeMap1"]);
 			m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(0));
 			Graphics.Blit(null, m_slopeMaps[0], m_slopeCopyMat, 0);
 			Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);
@@ -343,7 +301,8 @@ namespace Ceto
 			m_foamCopyMat.SetFloat("Ceto_FoamCoverage", waveSpectrum.foamCoverage);
 			Graphics.Blit(null, m_foamMaps[0], m_foamCopyMat, numGrids - 1);
 			Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMaps[0]);
-
+			//m_foamMapsCache[index][0].Save(index + "_m_foamMapsCache");
+			//Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMapsCache[index][0]);
 		}
 
 		int GetCacheIndex(float time)
@@ -362,7 +321,7 @@ namespace Ceto
         {
 			shaderCache_Float.Add(new Dictionary<string, float>());
 			shaderCache_Vector.Add(new Dictionary<string, Vector4>());
-			shaderCache_Texture.Add(new Dictionary<string, Texture>());
+			shaderCache_Texture.Add(new Dictionary<string, RenderTexture>());
 		}
 
 		private void SetGlobalFloat(int index, string propertyName, float value)
@@ -397,7 +356,68 @@ namespace Ceto
 				shaderCache_Vector[index][propertyName] = value;
 			}
 		}
-		private void SetGlobalTexture(int index, string propertyName, Texture2D src)
+
+		private void SetGlobalTexture(int index, string propertyName, RenderTexture src)
+		{
+			if (index >= shaderCache_Texture.Count)
+			{
+				AddNewItemToAllCacheList();
+			}
+
+			if (!shaderCache_Texture[index].ContainsKey(propertyName))
+			{
+				var rt = new RenderTexture(src);
+				rt.Create();
+				shaderCache_Texture[index].Add(propertyName, rt);
+			}
+			Graphics.CopyTexture(src, shaderCache_Texture[index][propertyName]);
+			//Graphics.Blit(null, shaderCache_Texture[index][propertyName], mat, pass);
+			//Graphics.Blit(null, shaderCache_Texture[index][propertyName]);
+		}
+		/*
+		private void SetGlobalTexture(int index, string propertyName, string mapName, Material mat, int pass)
+		{
+			if (index >= shaderCache_Texture.Count)
+			{
+				AddNewItemToAllCacheList();
+			}
+
+			if (!shaderCache_Texture[index].ContainsKey(propertyName))
+			{
+				int aniso = 9;
+				RenderTextureFormat format = RenderTextureFormat.ARGBFloat;
+
+				var rt = new RenderTexture(size, size, 32);
+				//rt.Create();
+				CreateMap(ref rt, mapName, format, size, aniso);
+				shaderCache_Texture[index].Add(propertyName, rt);
+			}
+
+			Graphics.Blit(null, shaderCache_Texture[index][propertyName], mat, pass);
+			//Graphics.Blit(null, shaderCache_Texture[index][propertyName]);
+		}
+		*/
+		private void SetGlobalTextureBlack(int index, string propertyName)
+		{
+			if (index >= shaderCache_Texture.Count)
+			{
+				AddNewItemToAllCacheList();
+			}
+
+			if (!shaderCache_Texture[index].ContainsKey(propertyName))
+			{
+				var rt = new RenderTexture(size, size, 24);
+				rt.Create(); 
+				shaderCache_Texture[index].Add(propertyName, rt);
+			}
+
+			var rtBlack = new RenderTexture(size, size, 24);
+			rtBlack.Create(); 
+			shaderCache_Texture[index][propertyName] = rtBlack;
+		}
+
+
+		/*private void SetGlobalTexture(int index, string propertyName, Texture2D src)
 		{
 			if (index >= shaderCache_Texture.Count)
 			{
@@ -417,6 +437,7 @@ namespace Ceto
 				shaderCache_Texture[index][propertyName] = value;
 			}
 		}
+
 		private void SetGlobalTexture(int index, string propertyName, RenderTexture src)
 		{
 			if (index >= shaderCache_Texture.Count)
@@ -449,7 +470,7 @@ namespace Ceto
 				//Debug.Log("Saving: " + fileName);
 				//(data.Value as RenderTexture).Save(fileName);
 			}
-		}
+		}*/
 		public void SaveGlobalTextures(float time)
 		{
 			int index = GetIndex(time);
@@ -496,97 +517,71 @@ namespace Ceto
 				}
 				else
 				{
-					//Process all tasks until scheduler is empty.
-					/*
-					while (m_scheduler.HasTasks())
-						UpdateSpectrumScheduler();
-					*/
-					//Settings changed and safe to recreate buffers.
-					//Clear everything and reset.
+
 					Release();
 					m_bufferSettings.beenCreated = false;
 				}
-
-				//Displacements can be carried out on the CPU or GPU.
-				//Only CPU displacements support height queries for buoyancy currently.
-				/*
-				if (isCpu)
-					m_displacementBuffer = new DisplacementBufferCPU(size, m_scheduler);
-				else
-					m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
-				*/
-				m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
-				m_slopeBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 2);
-				m_jacobianBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 3);
-
-				//m_readBuffer = new ComputeBuffer(size * size, sizeof(float) * 3);
-
-				//m_conditions = new WaveSpectrumCondition[2];
-				m_displacementMaps = new RenderTexture[4];
-				m_slopeMaps = new RenderTexture[2];
-				m_foamMaps = new RenderTexture[1];
-
-				m_bufferSettings.beenCreated = true;
-				m_bufferSettings.size = size;
-				m_bufferSettings.isCpu = isCpu;
 			}
 
-			void Release()
-			{
-				if (m_displacementBuffer != null)
-				{
-					m_displacementBuffer.Release();
-					m_displacementBuffer = null;
-				}
-
-				if (m_slopeBuffer != null)
-				{
-					m_slopeBuffer.Release();
-					m_slopeBuffer = null;
-				}
-
-				if (m_jacobianBuffer != null)
-				{
-					m_jacobianBuffer.Release();
-					m_jacobianBuffer = null;
-				}
-
-				RTUtility.ReleaseAndDestroy(m_displacementMaps);
-				m_displacementMaps = null;
-
-				RTUtility.ReleaseAndDestroy(m_slopeMaps);
-				m_slopeMaps = null;
-
-				RTUtility.ReleaseAndDestroy(m_foamMaps);
-				m_foamMaps = null;
-
-			}
-
-			//Displacements can be carried out on the CPU or GPU.
-			//Only CPU displacements support height queries for buoyancy currently.
-			/*
-			if (isCpu)
-				m_displacementBuffer = new DisplacementBufferCPU(size, m_scheduler);
-			else
-				m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
-			*/
 			m_displacementBuffer = new DisplacementBufferGPU(size, fourierSdr);
-
 			m_slopeBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 2);
 			m_jacobianBuffer = new WaveSpectrumBufferGPU(size, fourierSdr, 3);
 
-			//m_readBuffer = new ComputeBuffer(size * size, sizeof(float) * 3);
-
-			//m_conditions = new WaveSpectrumCondition[2];
 			m_displacementMaps = new RenderTexture[4];
 			m_slopeMaps = new RenderTexture[2];
 			m_foamMaps = new RenderTexture[1];
 
+			//init caches
+			for (int i = 0; i < m_displacementMapsCache.Length; i++)
+			{
+				m_displacementMapsCache[i] = new RenderTexture[4];
+			}
+			for (int i = 0; i < m_slopeMapsCache.Length; i++)
+			{
+				m_slopeMapsCache[i] = new RenderTexture[2];
+			}
+			for (int i = 0; i < m_foamMapsCache.Length; i++)
+			{
+				m_foamMapsCache[i] = new RenderTexture[1];
+			}
+
 			m_bufferSettings.beenCreated = true;
 			m_bufferSettings.size = size;
 			m_bufferSettings.isCpu = isCpu;
+			
+		}
+
+		void Release()
+		{
+			if (m_displacementBuffer != null)
+			{
+				m_displacementBuffer.Release();
+				m_displacementBuffer = null;
+			}
+
+			if (m_slopeBuffer != null)
+			{
+				m_slopeBuffer.Release();
+				m_slopeBuffer = null;
+			}
+
+			if (m_jacobianBuffer != null)
+			{
+				m_jacobianBuffer.Release();
+				m_jacobianBuffer = null;
+			}
+
+			RTUtility.ReleaseAndDestroy(m_displacementMaps);
+			m_displacementMaps = null;
+
+			RTUtility.ReleaseAndDestroy(m_slopeMaps);
+			m_slopeMaps = null;
+
+			RTUtility.ReleaseAndDestroy(m_foamMaps);
+			m_foamMaps = null;
 
 		}
+
 
 		/// <summary>
 		/// Create all the textures need to hold the data.
@@ -608,9 +603,33 @@ namespace Ceto
 			{
 				CreateMap(ref m_slopeMaps[i], "Slope", format, size, aniso);
 			}
+
 			for (int i = 0; i < m_foamMaps.Length; i++)
 			{
 				CreateMap(ref m_foamMaps[i], "Foam", format, size, aniso);
+			}
+
+			//caches
+			for (int i = 0; i < m_displacementMapsCache.Length; i++)
+			{
+				for (int j = 0; j < m_displacementMapsCache[i].Length; j++)
+				{
+					CreateMap(ref m_displacementMapsCache[i][j], "Displacement", format, size, aniso);
+				}
+			}
+			for (int i = 0; i < m_slopeMapsCache.Length; i++)
+			{
+				for (int j = 0; j < m_slopeMapsCache[i].Length; j++)
+				{
+					CreateMap(ref m_slopeMapsCache[i][j], "Slope", format, size, aniso);
+				}
+			}
+			for (int i = 0; i < m_foamMapsCache.Length; i++)
+			{
+				for (int j = 0; j < m_foamMapsCache[i].Length; j++)
+				{
+					CreateMap(ref m_foamMapsCache[i][j], "Foam", format, size, aniso);
+				}
 			}
 
 		}
@@ -711,10 +730,11 @@ namespace Ceto
 				//Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
 				//Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
 				//Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
-				SetGlobalTexture(index, "Ceto_DisplacementMap0", Texture2D.blackTexture);
-				SetGlobalTexture(index, "Ceto_DisplacementMap1", Texture2D.blackTexture);
-				SetGlobalTexture(index, "Ceto_DisplacementMap2", Texture2D.blackTexture);
-				SetGlobalTexture(index, "Ceto_DisplacementMap3", Texture2D.blackTexture);
+				SetGlobalTextureBlack(index, "Ceto_DisplacementMap0");
+				SetGlobalTextureBlack(index, "Ceto_DisplacementMap1");
+				SetGlobalTextureBlack(index, "Ceto_DisplacementMap2");
+				SetGlobalTextureBlack(index, "Ceto_DisplacementMap3");
+
 				return;
 			}
 			else if (m_displacementBuffer.Done)
@@ -746,27 +766,30 @@ namespace Ceto
 					if (numGrids > 0)
 					{
 						//If only 1 grids used use pass 4 as the packing is different.
-						Graphics.Blit(null, m_displacementMaps[0], m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
+						Graphics.Blit(null, m_displacementMapsCache[index][0], m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
+						//m_displacementMapsCache[index][0].Save(index + "_m_displacementMapsCache");
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMaps[0]);
-						SetGlobalTexture(index, "Ceto_DisplacementMap0", m_displacementMaps[0]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap0", m_displacementMaps[0]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap0", "Displacement", m_displacementCopyMat, (numGrids == 1) ? 4 : 0);
 					}
 					else
                     {
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
-						SetGlobalTexture(index, "Ceto_DisplacementMap0", Texture2D.blackTexture);
+						SetGlobalTextureBlack(index, "Ceto_DisplacementMap0");
 					}
 
 					//COPY GRIDS 2
 					if (numGrids > 1)
 					{
-						Graphics.Blit(null, m_displacementMaps[1], m_displacementCopyMat, 1);
+						Graphics.Blit(null, m_displacementMapsCache[index][1], m_displacementCopyMat, 1);
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMaps[1]);
-						SetGlobalTexture(index, "Ceto_DisplacementMap1", m_displacementMaps[1]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap1", m_displacementMaps[1]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap1", "Displacement", m_displacementCopyMat, 1);
 					}
 					else
 					{
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap1", Texture2D.blackTexture);
-						SetGlobalTexture(index, "Ceto_DisplacementMap1", Texture2D.blackTexture);
+						SetGlobalTextureBlack(index, "Ceto_DisplacementMap1");
 					}
 
 					m_displacementCopyMat.SetTexture("Ceto_DisplacementBuffer", m_displacementBuffer.GetTexture(2));
@@ -774,27 +797,29 @@ namespace Ceto
 					//COPY GRIDS 3
 					if (numGrids > 2)
 					{
-						Graphics.Blit(null, m_displacementMaps[2], m_displacementCopyMat, 2);
+						Graphics.Blit(null, m_displacementMapsCache[index][2], m_displacementCopyMat, 2);
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
-						SetGlobalTexture(index, "Ceto_DisplacementMap2", m_displacementMaps[2]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap2", m_displacementMaps[2]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap2", "Displacement", m_displacementCopyMat, 2);
 					}
 					else
 					{
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap2", Texture2D.blackTexture);
-						SetGlobalTexture(index, "Ceto_DisplacementMap2", Texture2D.blackTexture);
+						SetGlobalTextureBlack(index, "Ceto_DisplacementMap2");
 					}
 
 					//COPY GRIDS 4
 					if (numGrids > 3)
 					{
-						Graphics.Blit(null, m_displacementMaps[3], m_displacementCopyMat, 3);
+						Graphics.Blit(null, m_displacementMapsCache[index][3], m_displacementCopyMat, 3);
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
-						SetGlobalTexture(index, "Ceto_DisplacementMap3", m_displacementMaps[3]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap3", m_displacementMaps[2]);
+						//SetGlobalTexture(index, "Ceto_DisplacementMap3", "Displacement", m_displacementCopyMat, 3);
 					}
 					else
 					{
 						//Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
-						SetGlobalTexture(index, "Ceto_DisplacementMap3", Texture2D.blackTexture);
+						SetGlobalTextureBlack(index, "Ceto_DisplacementMap3");
 					}
 
 					m_displacementBuffer.DisableSampling();
@@ -824,8 +849,8 @@ namespace Ceto
 			//If slopes disabled zero textures
 			if (m_slopeBuffer.EnabledBuffers() == 0)
 			{
-				SetGlobalTexture(index, "Ceto_SlopeMap0", Texture2D.blackTexture);
-				SetGlobalTexture(index, "Ceto_SlopeMap1", Texture2D.blackTexture);
+				SetGlobalTextureBlack(index, "Ceto_SlopeMap0");
+				SetGlobalTextureBlack(index, "Ceto_SlopeMap1");
 			}
 			else
 			{
@@ -851,30 +876,32 @@ namespace Ceto
 					if (numGrids > 0)
 					{
 						m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(0));
-						Graphics.Blit(null, m_slopeMaps[0], m_slopeCopyMat, 0);
+						Graphics.Blit(null, m_slopeMapsCache[index][0], m_slopeCopyMat, 0);
 						//m_slopeMaps[0].Save("Slope0");
 						//Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMaps[0]);
-						SetGlobalTexture(index, "Ceto_SlopeMap0", m_slopeMaps[0]);
+						//SetGlobalTexture(index, "Ceto_SlopeMap0", m_slopeMaps[0]);
+						//SetGlobalTexture(index, "Ceto_SlopeMap0", "Slope", m_slopeCopyMat, 0);
 					}
 					else
 					{
 						//Shader.SetGlobalTexture("Ceto_SlopeMap0", Texture2D.blackTexture);
-						SetGlobalTexture(index, "Ceto_SlopeMap0", Texture2D.blackTexture);
+						SetGlobalTextureBlack(index, "Ceto_SlopeMap0");
 					}
 
 					//COPY GRIDS 3 and 4
 					if (numGrids > 2)
 					{
 						m_slopeCopyMat.SetTexture("Ceto_SlopeBuffer", m_slopeBuffer.GetTexture(1));
-						Graphics.Blit(null, m_slopeMaps[1], m_slopeCopyMat, 0);
+						Graphics.Blit(null, m_slopeMapsCache[index][1], m_slopeCopyMat, 0);
 						//m_slopeMaps[0].Save("Slope1");
 						//Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMaps[1]);
-						SetGlobalTexture(index, "Ceto_SlopeMap1", m_slopeMaps[1]);
+						//SetGlobalTexture(index, "Ceto_SlopeMap1", m_slopeMaps[1]);
+						//SetGlobalTexture(index, "Ceto_SlopeMap1", "Slope", m_slopeCopyMat, 0);
 					}
 					else
 					{
 						//Shader.SetGlobalTexture("Ceto_SlopeMap1", Texture2D.blackTexture);
-						SetGlobalTexture(index, "Ceto_SlopeMap1", Texture2D.blackTexture);
+						SetGlobalTextureBlack(index, "Ceto_SlopeMap1");
 					}
 
 					m_slopeBuffer.DisableSampling();
@@ -914,7 +941,8 @@ namespace Ceto
 			if (m_jacobianBuffer.EnabledBuffers() == 0)
 			{
 				//Shader.SetGlobalTexture("Ceto_FoamMap0", Texture2D.blackTexture);
-				SetGlobalTexture(index, "Ceto_FoamMap0", Texture2D.blackTexture);
+				SetGlobalTextureBlack(index, "Ceto_FoamMap0");
+
 			}
 			else
 			{
@@ -953,10 +981,12 @@ namespace Ceto
 					m_foamCopyMat.SetVector("Ceto_FoamChoppyness", foamChoppyness);
 					m_foamCopyMat.SetFloat("Ceto_FoamCoverage", waveSpectrum.foamCoverage);
 
-					Graphics.Blit(null, m_foamMaps[0], m_foamCopyMat, numGrids - 1);
+					//Graphics.Blit(null, m_foamMaps[0], m_foamCopyMat, numGrids - 1);
+					Graphics.Blit(null, m_foamMapsCache[index][0], m_foamCopyMat, numGrids - 1);
 					//Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMaps[0]);
-					SetGlobalTexture(index, "Ceto_FoamMap0", m_foamMaps[0]);
-
+					//SetGlobalTexture(index, "Ceto_FoamMap0", m_foamMaps[0]);
+					//SetGlobalTexture(index, "Ceto_FoamMap0", "Foam", m_foamCopyMat, numGrids - 1);
+					
 					m_jacobianBuffer.DisableSampling();
 					m_jacobianBuffer.BeenSampled = true;
 				}

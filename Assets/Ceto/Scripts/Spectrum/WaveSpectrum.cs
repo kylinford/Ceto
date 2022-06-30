@@ -335,13 +335,13 @@ namespace Ceto
 
 		public WaveSpectrumCache cache { get; private set; }
 
-		IEnumerator Start()
+		private IEnumerator Start()
 		{
 			cache = GetComponent<WaveSpectrumCache>();
+
 			if (cache.enabled)
 			{
-				yield return new WaitUntil(() => cache.IsReady);
-				//Debug.Log("yield start");
+				yield return new WaitUntil(() => cache.finishedStart);
 				Start_FromCache();
 			}
 			else
@@ -380,8 +380,8 @@ namespace Ceto
 			m_bufferSettings.size = cache.size;
 			m_bufferSettings.isCpu = cache.isCpu;
 			*/
-			CreateRenderTextures();
-			
+			//CreateRenderTextures();
+
 			//CreateConditions();
 			m_conditions = new WaveSpectrumCondition[2];
 			m_conditions[0] = cache.condition;
@@ -559,20 +559,17 @@ namespace Ceto
             {
 				Update_FromCache();
 			}
-			else
-            {
-				Update_Realtime();
-            }
 		}
 
 		public void Update_FromCache()
         {
+			
 			//Debug.Log("Update_FromCache");
 			if (m_conditions == null || m_conditions[0] == null)
 			{
 				return;
 			}
-
+			
 			try
 			{
 				//Clamp
@@ -611,8 +608,8 @@ namespace Ceto
 				UpdateQueryScaling();
 
 				//Apply cache values
-				//cache.GenerateByCacheRead(time);
-				cache.GenerateByBufferRun(time);
+				cache.GenerateByCacheRead(time);
+				//cache.GenerateByBufferRun(time);
 
 				//Generate new data from the current time value. 
 				//GenerateDisplacement(time);
