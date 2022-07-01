@@ -21,13 +21,22 @@ namespace Ceto
             Application.targetFrameRate = 100;
         }
 
-        void Update()
+        private void Start()
         {
-            text.text = "FPS = " + m_fps.FrameRate.ToString("F2");
-                //+ "\nsupportDX11=" + (SystemInfo.graphicsShaderLevel>=50 &&  SystemInfo.supportsComputeShaders);
-                //+ "\ntargetFrameRate = " + Application.targetFrameRate.ToString("F2");
-            //text.text = "targetFrameRate = " + Application.targetFrameRate.ToString("F2");
+            StartCoroutine(UpdateTextEnumerator());
         }
+
+        private IEnumerator UpdateTextEnumerator()
+        {
+            while(true)
+            {
+                yield return new WaitForSeconds(1);
+                //text.text = "FPS = " + m_fps.FrameRate.ToString("F2");
+                text.text = "FPS = " + (1f / Time.deltaTime).ToString("F2");
+            }
+
+        }
+
     }
 }
 

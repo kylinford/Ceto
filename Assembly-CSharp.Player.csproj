@@ -62,7 +62,7 @@
     <Compile Include="Assets\Ceto\Scripts\Spectrum\WaveSpectrum.cs" />
     <Compile Include="Assets\Pirates Island\Standard Assets\Image Effects (Pro Only)\ImageEffectBase.cs" />
     <Compile Include="Assets\Ceto\Scripts\Utility\ShipCamera.cs" />
-    <Compile Include="Assets\Ceto\Scripts\Utility\TextFPS.cs" />
+    <Compile Include="Assets\JW\TextFPS.cs" />
     <Compile Include="Assets\Ceto\Scripts\UnderWater\RefractionCommand.cs" />
     <Compile Include="Assets\Ceto\Scripts\Ocean\Querys\WaveQueryTask.cs" />
     <Compile Include="Assets\Ceto\Scripts\Ocean\Overlays\AddAutoShoreMask.cs" />
@@ -108,7 +108,7 @@
     <Compile Include="Assets\Ceto\Scripts\Reflections\ReflactionData.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Unity\NotifyOnRenderObject.cs" />
     <Compile Include="Assets\Ceto\Scripts\Common\Threading\Tasks\ICancelToken.cs" />
-    <Compile Include="Assets\Ceto\Scripts\Utility\TargetFPS.cs" />
+    <Compile Include="Assets\JW\TargetFPS.cs" />
     <Compile Include="Assets\Ceto\Scripts\Ocean\IOceanTime.cs" />
     <Compile Include="Assets\Pirates Island\Standard Assets\Water (Pro Only)\Water4\Sources\Scripts\PlanarReflection.cs" />
     <Compile Include="Assets\Ceto\Scripts\Ocean\CameraData\ViewData.cs" />

@@ -131,6 +131,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1791727458}
     m_Modifications:
+    - target: {fileID: 972152392618704364, guid: 62086972c74351f47affbf0751f358a2,
+        type: 3}
+      propertyPath: m_Text
+      value: FPS
+      objectReference: {fileID: 0}
     - target: {fileID: 972152392618704369, guid: 62086972c74351f47affbf0751f358a2,
         type: 3}
       propertyPath: m_Name
@@ -402,7 +407,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &700235524
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -436,7 +441,7 @@ Terrain:
   m_ShadowCastingMode: 2
   m_DrawHeightmap: 1
   m_DrawInstanced: 0
-  m_DrawTreesAndFoliage: 1
+  m_DrawTreesAndFoliage: 0
   m_ReflectionProbeUsage: 1
   m_MaterialTemplate: {fileID: 2100000, guid: 5deafd12dd3e8744daaa5ab94c7a8b52, type: 2}
   m_BakeLightProbesForTrees: 1
@@ -506,7 +511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &873330478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,7 +724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: fourierSize
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: textureFoam
@@ -779,7 +784,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11444958, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: specularIntensity
@@ -833,6 +838,10 @@ PrefabInstance:
       propertyPath: resolution
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 11455084, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: reflectionMask.m_Bits
       value: 4294967295
@@ -843,6 +852,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: reflectionIntensity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475164, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
