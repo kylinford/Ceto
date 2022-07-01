@@ -542,8 +542,9 @@ namespace Ceto
 				//Update the scheduler so any tasks that have just finished are processed. 
 				UpdateSpectrumScheduler();
 
-				if (cache != null && cache.enabled && cache.finishedStart)
+				if (cache != null && cache.enabled && cache.cachedEnough)
                 {
+					Debug.Log("Cached: " + cache.count);
 					//Apply cached data from the current time value.
 					cache.ApplyCachedTextures(time);
 				}

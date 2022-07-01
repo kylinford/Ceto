@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Ceto;
+using System.Threading;
 
 public class WaveSpectrumCache : MonoBehaviour
 {
 	/// <summary>
 	/// Tells if this component has finished start function
 	/// </summary>
-	public bool finishedStart { get; private set; } = false;
+	public bool cachedEnough =>count >= 10;
 	/// <summary>
 	/// Time interval used for maps array: displacement, slope, foam maps array.
 	/// </summary>
@@ -16,7 +17,20 @@ public class WaveSpectrumCache : MonoBehaviour
 	/// <summary>
 	/// The length used for maps array: displacement, slope, foam maps array.
 	/// </summary>
-	public const int CACHE_SIZE = 200;
+	public const int CACHE_SIZE = 300;
+	private float maxUpdateTimer = (float)CACHE_SIZE * SEC_INTERVAL / 2f;
+	/// <summary>
+	/// Count for all generated and cached maps
+	/// </summary>
+	public int count { get; private set; } = 0;
+	/// <summary>
+	/// The current index of maps in cache being applied.
+	/// </summary>
+	public int currAppliedIndex { get; private set; } = 0;
+	/// <summary>
+	/// The last index of maps in cache that was updated
+	/// </summary>
+	public int currUpdatedIndex => count % CACHE_SIZE - 1;
 	/// <summary>
 	/// Maps cache
 	/// </summary>
@@ -47,35 +61,98 @@ public class WaveSpectrumCache : MonoBehaviour
 		CreateBuffers();
 		CreateRenderTextures();
 		GenerateAllMaps();
-		finishedStart = true;
+
+		//Thread tdUpdateCache = new Thread(new ThreadStart(UpdateCaches));
+		//tdUpdateCache.Start();
+		//StartCoroutine(UpdateCacheEnumerator());
+	}
+
+	/// <summary>
+	/// Generate curr map by count++. 
+	/// </summary>
+	void GenerateCurrMap()
+    {
+		float time = SEC_INTERVAL * (float)count;
+		int index = count % CACHE_SIZE;
+
+		if (!waveSpectrum.disableDisplacements)
+			GenerateDisplacementMaps(index, time);
+		if (!waveSpectrum.disableSlopes)
+			GenerateSlopeMaps(index, time);
+		if (!waveSpectrum.disableFoam)
+			GenerateFoamMaps(index, time);
+
+		count++;
 	}
 
     void GenerateAllMaps()
 	{
 		for (int i = 0; i < CACHE_SIZE; i++)
 		{
-			float time = SEC_INTERVAL * (float)i;
-			if (!waveSpectrum.disableDisplacements)
-				GenerateDisplacementMaps(i, time);
-			if (!waveSpectrum.disableSlopes)
-				GenerateSlopeMaps(i, time);
-			if (!waveSpectrum.disableFoam)
-				GenerateFoamMaps(i, time);
+			GenerateCurrMap();
 		}
 	}
+
 	public void ApplyCachedTextures(float time)
 	{
-		int index = GetIndex(time);
+		currAppliedIndex = GetApplyIndex(time);
 
-		Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMapsCache[index][0]);
-		Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMapsCache[index][1]);
-		Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMapsCache[index][2]);
-		Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMapsCache[index][3]);
-		Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMapsCache[index][0]);
-		Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMapsCache[index][1]);
-		Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMapsCache[index][0]);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap0", m_displacementMapsCache[currAppliedIndex][0]);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap1", m_displacementMapsCache[currAppliedIndex][1]);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMapsCache[currAppliedIndex][2]);
+		Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMapsCache[currAppliedIndex][3]);
+		Shader.SetGlobalTexture("Ceto_SlopeMap0", m_slopeMapsCache[currAppliedIndex][0]);
+		Shader.SetGlobalTexture("Ceto_SlopeMap1", m_slopeMapsCache[currAppliedIndex][1]);
+		Shader.SetGlobalTexture("Ceto_FoamMap0", m_foamMapsCache[currAppliedIndex][0]);
 	}
-	public int GetIndex(float time)
+
+	private void UpdateUsedCaches()
+    {
+		//Debug.Log("Start UpdateCaches: " + currUpdatedIndex + "-" + currAppliedIndex);
+		if (count < CACHE_SIZE)
+        {
+			return;
+        }
+		int countMaxUpdateLeft = 20;
+		int currCurrAppliedIndex = currAppliedIndex;
+		while (countMaxUpdateLeft-- > 0)
+        {
+			if (currCurrAppliedIndex > currUpdatedIndex && currCurrAppliedIndex - currUpdatedIndex < 2)
+            {
+				return;
+            }
+			else
+            {
+				//Debug.Log("UpdateCaches GenerateCurrMap");
+				GenerateCurrMap();
+			}
+        }
+		/*
+		while (currAppliedIndex != currUpdatedIndex)
+		{
+			//Debug.Log("Updating: " + currUpdatedIndex + "-" + currAppliedIndex);
+			GenerateCurrMap();
+			if (currAppliedIndex > currUpdatedIndex && currAppliedIndex - currUpdatedIndex < 2)
+            {
+				return;
+            }
+		}*/
+	}
+
+	private IEnumerator UpdateCacheEnumerator()
+    {
+		while(true)
+        {
+			//yield return new WaitForSeconds(maxUpdateTimer / 5f);
+			yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
+			UpdateUsedCaches();
+		}
+    }
+
+
+	//Should only be used for applying. Can't be used for editing cache. Because it skips indices.
+	public int GetApplyIndex(float time)
 	{
 		return ((int)(time / SEC_INTERVAL)) % CACHE_SIZE;
 	}
