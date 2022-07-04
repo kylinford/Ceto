@@ -382,13 +382,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 620287040}
-  m_LocalRotation: {x: 0.16665345, y: -0.8177706, z: 0.37856188, w: 0.40021107}
+  m_LocalRotation: {x: 0.27116695, y: -0.89070404, z: 0.13676248, w: 0.3382469}
   m_LocalPosition: {x: 294.39224, y: 62.023384, z: 443.8846}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 48.811, y: -126.644, z: 2.649}
+  m_LocalEulerAnglesHint: {x: 25.282, y: -144.243, z: -25.589}
 --- !u!1 &700235523
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,7 +407,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!154 &700235524
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -511,7 +511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &873330478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -724,7 +724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: fourierSize
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: textureFoam
