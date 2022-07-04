@@ -502,7 +502,7 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 	//Depth fade fades the caustics the deeper the object is in the ocean.
 	float depthFadeScale = Ceto_CausticTextureScale.w * Ceto_CausticTextureScale.w;
 	//float depthFade = exp(-max(0.0, surfacePos.y - distortedWorldDepthPos.y) * depthFadeScale);
-	float factor = 1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 200 * 4 / log2(dist);
+	float factor = 1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 1200 / log2(dist);
 	factor = clamp(factor, 0, 300);
 	float depthFade = factor * depthFadeScale;
 
