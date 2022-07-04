@@ -61,7 +61,8 @@ public class WaveSpectrumCache : MonoBehaviour
 		CreateBuffers();
 		CreateRenderTextures();
 		GenerateAllMaps();
-
+		//LoadAllMapsFromResources();
+		//SaveAllMaps();
 		//Thread tdUpdateCache = new Thread(new ThreadStart(UpdateCaches));
 		//tdUpdateCache.Start();
 		//StartCoroutine(UpdateCacheEnumerator());
@@ -90,6 +91,69 @@ public class WaveSpectrumCache : MonoBehaviour
 		for (int i = 0; i < CACHE_SIZE; i++)
 		{
 			GenerateCurrMap();
+		}
+	}
+
+	void LoadAllMapsFromResources()
+    {
+		int numGrids = condition.Key.NumGrids;
+
+		for (int i = 0; i < CACHE_SIZE; i++)
+		{
+			/*
+			for (int j = 0; j < 4; j++)
+			{
+				string fileName = "map_displacement_" + i + "_" + j;
+				var rt = Resources.Load("MapCache/" + fileName) as RenderTexture;
+
+				if (numGrids > j)
+				{
+					//If only 1 grids used use pass 4 as the packing is different.
+					//Graphics.Blit(null, m_displacementMapsCache[i][0], M_DisplacementCopyMat, (numGrids == 1) ? 4 : j);
+
+				}
+				Graphics.Blit(rt, m_displacementMapsCache[i][j]);
+
+				//m_displacementMapsCache[i][j] = rt;
+				++count;
+			}*/
+			
+			for (int j = 0; j < 2; j++)
+			{
+				string fileName = "map_slope_" + i + "_" + j;
+				var rt = Resources.Load("MapCache/" + fileName) as RenderTexture;
+				Graphics.Blit(Resources.Load("MapCache/" + fileName) as Texture, m_slopeMapsCache[i][j]);
+				//m_slopeMapsCache[i][j] = rt;
+				++count;
+			}
+			/*
+			for (int j = 0; j < 1; j++)
+			{
+				string fileName = "map_foam_" + i + "_" + j;
+				var rt = Resources.Load("MapCache/" + fileName) as Texture2D;
+				//Graphics.Blit(rt, m_foamMapsCache[i][j], );
+				//m_foamMapsCache[i][j] = rt;
+				++count;
+			}*/
+		}
+	}
+
+	void SaveAllMaps()
+    {
+        for (int i = 0; i < CACHE_SIZE; i++)
+        {
+			for (int j = 0; j < 4; j++)
+			{
+				m_displacementMapsCache[i][j].Save("map_displacement_" + i + "_" + j);
+			}
+			for (int j = 0; j < 2; j++)
+			{
+				m_slopeMapsCache[i][j].Save("map_slope_" + i + "_" + j);
+			}
+			for (int j = 0; j < 1; j++)
+			{
+				m_foamMapsCache[i][j].Save("map_foam_" + i + "_" + j);
+			}
 		}
 	}
 
