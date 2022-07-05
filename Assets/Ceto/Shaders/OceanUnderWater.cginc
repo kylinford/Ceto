@@ -8,25 +8,27 @@
 */
 fixed FoamAmount(float3 worldPos, fixed4 foam)
 {
-
+	//return foam.y;
 	//foam.x == the wave (spectrum) foam.
 	//foam.y == the overlay foam with foam texture.
 	//foam.z == the overlay foam with no foam texture.
 
 	fixed foamTexture = 0.0;
-
+	
 	#ifndef CETO_DISABLE_FOAM_TEXTURE
    		foamTexture += tex2D(Ceto_FoamTexture0, (worldPos.xz + Ceto_FoamTextureScale0.z) * Ceto_FoamTextureScale0.xy).a * 0.5;
 		foamTexture += tex2D(Ceto_FoamTexture1, (worldPos.xz + Ceto_FoamTextureScale1.z) * Ceto_FoamTextureScale1.xy).a * 0.5;
 	#else
 		foamTexture = 1.0;
 	#endif
+		
 
 	//Apply texture to the wave foam if that option is enabled.
-    foam.x = lerp(foam.x, foam.x * foamTexture, Ceto_TextureWaveFoam);
+    //foam.x = lerp(foam.x, foam.x * foamTexture, Ceto_TextureWaveFoam);
 	//Apply texture to overlay foam
    	foam.y = foam.y * foamTexture;
    
+	return max(foam.x, foam.y);
    	return saturate(max(max(foam.x, foam.y), foam.z));
 
 }
@@ -41,7 +43,13 @@ fixed3 AddFoamColor(fixed foamAmount, fixed3 oceanCol)
 	//apply the absorption coefficient to the foam based on the foam strength.
 	//This will fade the foam add make it look like it has some depth and
 	//since it uses the abs cof the color should match the water.
-	fixed3 foamCol = Ceto_FoamTint * foamAmount * exp(-Ceto_AbsCof.rgb * (1.0 - foamAmount) * 1.0);
+	// 
+	//fixed3 foamCol = Ceto_FoamTint * foamAmount * exp(-Ceto_AbsCof.rgb * (1.0 - foamAmount) * 1.0);
+
+	fixed rgbFoam = Ceto_AbsCof.rgb * (1.0 - foamAmount);
+	fixed inversedRgbFoam = 0.3 / (rgbFoam);
+	inversedRgbFoam = saturate(inversedRgbFoam);
+	fixed3 foamCol = Ceto_FoamTint * foamAmount * inversedRgbFoam;
 
 	//TODO - find better way than lerp to blend.
 	return lerp(oceanCol, foamCol, foamAmount);
@@ -503,9 +511,10 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 	float depthFadeScale = Ceto_CausticTextureScale.w * Ceto_CausticTextureScale.w;
 	
 	//float depthFade = exp(-max(0.0, surfacePos.y - distortedWorldDepthPos.y) * depthFadeScale);
-	float factor = 1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 1200 / log2(dist);
-	factor = clamp(factor, 0, 300);
+	float factor = 1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 1000;
+	//factor = clamp(factor, 0, 1000);
 	float depthFade = factor * depthFadeScale;
+	depthFade = clamp(factor, 0, 3);
 
 	fixed3 caustic = tex2D(Ceto_CausticTexture, uv);
 
@@ -516,6 +525,7 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 	//This reduces aliasing issues and in forward mode the DepthNormal texture
 	//gets noisey when far away from a object causing noise in the normal fade texture.
 	float distFade = 1.0 - saturate(dist * 0.001);
+	//float distFade = saturate(1 / log2(dist));
 
 	col = caustic * Ceto_CausticTint * nf * distFade * depthFade;
 

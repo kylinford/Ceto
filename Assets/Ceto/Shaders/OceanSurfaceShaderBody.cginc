@@ -134,8 +134,8 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 
 	float3 worldDepthPos = WorldDepthPos(disortionUV.xy);
 
-	//fixed3 caustics = CausticsFromAbove(disortionUV.xy, unmaskedNorm, worldPos, worldDepthPos, dist);
-	fixed3 caustics = fixed3(0, 0, 0);
+	fixed3 caustics = CausticsFromAbove(disortionUV.xy, unmaskedNorm, worldPos, worldDepthPos, dist);
+	//fixed3 caustics = fixed3(0, 0, 0);
 
 	fixed3 sea = OceanColorFromAbove(disortionUV, worldPos, depth, caustics);
 	//fixed3 sea = Ceto_DefaultOceanColor;
@@ -146,25 +146,26 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 	fixed fresnel = FresnelAirWater_Simplified(view, norm3);
 	//fixed fresnel = 0.2;
 
-	//fixed foamAmount = FoamAmount(worldPos, foam);
-
 	fixed3 col = fixed3(0, 0, 0);
 
 	col += sky * fresnel;
 
 	col += sea * (1.0 - fresnel);
 
-	//col = AddFoamColor(foamAmount, col);
+	//foam
+	fixed foamAmount = FoamAmount(worldPos, foam);
+	//fixed foamAmount = 0;
+	col = AddFoamColor(foamAmount, col);
 
+	//edge fade
 	float edgeFade = EdgeFade(screenUV.xy, view, worldPos, worldDepthPos);
-
 	col = ApplyEdgeFade(col, screenUV.zw, edgeFade, o.Alpha, o.LightMask);
 
 	o.Albedo = col;
 	o.Normal = TangentSpaceNormal(norm3);
 	o.DNormal = norm3;
 	o.Fresnel = fresnel;
-	o.Foam = 0;
+	o.Foam = foamAmount;
 	
 }
 
