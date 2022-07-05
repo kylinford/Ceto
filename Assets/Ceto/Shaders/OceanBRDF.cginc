@@ -32,6 +32,14 @@ fixed FresnelAirWater(fixed3 V, fixed3 N)
     #endif
 }
 
+fixed FresnelAirWater_Simplified(fixed3 V, fixed3 N)
+{
+	fixed product = dot(N, V);
+	fixed oneMinusProduct = 1 - product;
+	fixed oneMinusProduct5 = oneMinusProduct * oneMinusProduct * oneMinusProduct * oneMinusProduct * oneMinusProduct;
+	return oneMinusProduct5;
+}
+
 fixed FresnelWaterAir(fixed3 V, fixed3 N) 
 {
 
@@ -125,10 +133,8 @@ half ReflectedSunRadianceFast(half3 V, half3 N, half3 L, fixed fresnel)
 
     return (L.y < 0 || zL <= 0.0) ? 0.0 : max(Ceto_SpecularIntensity * p * sqrt(abs(zL / zV)), 0.0);
 }
-
 inline fixed4 OceanBRDFLight(SurfaceOutputOcean s, half3 viewDir, UnityLight light)
 {
-
 	fixed4 c = fixed4(0,0,0,1);
 	
 	half3 V = viewDir;
@@ -177,7 +183,7 @@ inline fixed4 OceanBRDFLight(SurfaceOutputOcean s, half3 viewDir, UnityLight lig
 #endif
 
 	return c;
-
+	
 }
 
 inline fixed4 LightingOceanBRDF(SurfaceOutputOcean s, half3 viewDir, UnityGI gi)
