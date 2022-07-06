@@ -28,8 +28,9 @@ fixed FoamAmount(float3 worldPos, fixed4 foam)
 	//Apply texture to overlay foam
    	foam.y = foam.y * foamTexture;
    
-	return max(foam.x, foam.y);
-   	return saturate(max(max(foam.x, foam.y), foam.z));
+	return foam.y;
+	//return max(foam.x, foam.y);
+	//return saturate(max(max(foam.x, foam.y), foam.z));
 
 }
 
@@ -313,8 +314,11 @@ fixed3 AboveRefractionColor(float2 grabUV, float3 surfacePos, float depth, fixed
 
 	grab += caustics;
 	
-	fixed3 col = grab * Ceto_AbsTint * exp(-Ceto_AbsCof.rgb * depth * Ceto_MaxDepthDist * Ceto_AbsCof.a);
-	
+	//fixed3 col = grab * Ceto_AbsTint * exp(-Ceto_AbsCof.rgb * depth * Ceto_MaxDepthDist * Ceto_AbsCof.a);
+	fixed3 inverse = 0.7 / (Ceto_AbsCof.rgb * depth * Ceto_MaxDepthDist * Ceto_AbsCof.a);
+	inverse = saturate(inverse);
+	fixed3 col = grab * Ceto_AbsTint * inverse;
+
 	return col;
 }
 
@@ -335,13 +339,17 @@ fixed3 BelowRefractionColor(float2 grabUV)
 */
 fixed3 AddAboveInscatter(fixed3 col, float depth)
 {
-
 	//There are 3 methods used to apply the inscatter.
 	half3 inscatterScale;
 	inscatterScale.x = saturate(depth * Ceto_AboveInscatterScale);
-	inscatterScale.y = saturate(1.0-exp(-depth * Ceto_AboveInscatterScale));
-	inscatterScale.z = saturate(1.0-exp(-depth * depth * Ceto_AboveInscatterScale));
-	
+
+	//inscatterScale.y = saturate(1.0-exp(-depth * Ceto_AboveInscatterScale));
+	half inverseY = min(0.7, 0.6 / (depth * Ceto_AboveInscatterScale));
+	inscatterScale.y = saturate(1.0-inverseY);
+
+	//inscatterScale.z = saturate(1.0-exp(-depth  * Ceto_AboveInscatterScale));
+	inscatterScale.z = inscatterScale.y;
+
 	//Apply mask to pick which methods result to use.
 	half a = dot(inscatterScale, Ceto_AboveInscatterMode);
 	
@@ -357,7 +365,9 @@ fixed3 AddBelowInscatter(fixed3 col, float depth)
 	//There are 3 methods used to apply the inscatter.
 	half3 inscatterScale;
 	inscatterScale.x = saturate(depth * Ceto_BelowInscatterScale);
+
 	inscatterScale.y = saturate(1.0-exp(-depth * Ceto_BelowInscatterScale));
+
 	inscatterScale.z = saturate(1.0-exp(-depth * depth * Ceto_BelowInscatterScale));
 	
 	//Apply mask to pick which methods result to use.
@@ -437,7 +447,8 @@ float EdgeFade(float2 screenUV, float3 view, float3 surfacePos, float3 worldDept
 	#endif
 
 		dist = max(0.0, dist);
-		edgeFade = 1.0 - saturate(exp(-dist * Ceto_EdgeFade) * 2.0);
+		//edgeFade = 1.0 - saturate(exp(-dist * Ceto_EdgeFade) * 2.0);
+		edgeFade = 1.0 - saturate(2.5 / dist / Ceto_EdgeFade);
 
 		//Restrict blending when viewing ocean from a shallow angle
 		//as it will cause some artifacts at horizon.
@@ -479,6 +490,7 @@ fixed3 ApplyEdgeFade(fixed3 col, float2 grabUV, float edgeFade, out fixed alpha,
 
 		#ifdef CETO_TRANSPARENT_QUEUE
 			alpha = edgeFade;
+			//alpha = min(edgeFade, 0.9);
 			lightMask = 0.0;
 		#endif
 

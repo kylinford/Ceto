@@ -74,7 +74,7 @@ void OceanSurfTop_PureColor(Input IN, inout SurfaceOutputOcean o)
 	o.Fresnel = 1;
 	o.Foam = 1;
 	o.Alpha = 0.5;
-	o.LightMask = 1 - o.Alpha;
+	o.LightMask = 0;
 }
 
 void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
@@ -166,7 +166,8 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 	o.DNormal = norm3;
 	o.Fresnel = fresnel;
 	o.Foam = foamAmount;
-	
+	//o.Alpha = 0.8;
+	//o.LightMask = 0;
 }
 
 
@@ -434,7 +435,7 @@ void OceanSurfUnder(Input IN, inout SurfaceOutputOcean o)
 
 	fixed3 col = fixed3(0, 0, 0);
 
-	col += sea * fresnel;
+	col += sea * fresnel;	
 
 	col += sky * (1.0 - fresnel);
 
