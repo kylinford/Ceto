@@ -12,7 +12,7 @@ fixed FoamAmount(float3 worldPos, fixed4 foam)
 	//foam.x == the wave (spectrum) foam.
 	//foam.y == the overlay foam with foam texture.
 	//foam.z == the overlay foam with no foam texture.
-
+	
 	fixed foamTexture = 0.0;
 	
 	#ifndef CETO_DISABLE_FOAM_TEXTURE
@@ -21,15 +21,26 @@ fixed FoamAmount(float3 worldPos, fixed4 foam)
 	#else
 		foamTexture = 1.0;
 	#endif
-		
+	
 
 	//Apply texture to the wave foam if that option is enabled.
     //foam.x = lerp(foam.x, foam.x * foamTexture, Ceto_TextureWaveFoam);
 	//Apply texture to overlay foam
    	foam.y = foam.y * foamTexture;
-   
-	return foam.y;
-	//return max(foam.x, foam.y);
+
+	
+	float dist = length(_WorldSpaceCameraPos - worldPos);
+	/*if (foam.x > 0)
+	{
+		foam.x = 1;
+	}*/
+	if (dist > 200 || dist < 190)
+	{
+		foam.x = 0;
+	}
+	//foam.x = 0.2;
+	return saturate(foam.y);
+	//return saturate(max(foam.x, foam.y));
 	//return saturate(max(max(foam.x, foam.y), foam.z));
 
 }
@@ -40,20 +51,21 @@ fixed FoamAmount(float3 worldPos, fixed4 foam)
 */
 fixed3 AddFoamColor(fixed foamAmount, fixed3 oceanCol)
 {
-
 	//apply the absorption coefficient to the foam based on the foam strength.
 	//This will fade the foam add make it look like it has some depth and
 	//since it uses the abs cof the color should match the water.
 	// 
 	//fixed3 foamCol = Ceto_FoamTint * foamAmount * exp(-Ceto_AbsCof.rgb * (1.0 - foamAmount) * 1.0);
 
+	/*
 	fixed rgbFoam = Ceto_AbsCof.rgb * (1.0 - foamAmount);
 	fixed inversedRgbFoam = 0.3 / (rgbFoam);
 	inversedRgbFoam = saturate(inversedRgbFoam);
 	fixed3 foamCol = Ceto_FoamTint * foamAmount * inversedRgbFoam;
-
+	*/
 	//TODO - find better way than lerp to blend.
-	return lerp(oceanCol, foamCol, foamAmount);
+	//return lerp(oceanCol, foamCol, foamAmount);
+	return lerp(oceanCol, fixed3(1,1,1), foamAmount);
 }
 
 /*

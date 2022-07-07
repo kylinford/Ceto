@@ -746,6 +746,9 @@ namespace Ceto
                 case MESH_RESOLUTION.LOW:
                     return 16;
 
+				case MESH_RESOLUTION.MOBILE:
+					return 64;
+
                 default:
                     return 16;
             }

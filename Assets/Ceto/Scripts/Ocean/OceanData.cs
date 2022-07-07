@@ -12,7 +12,7 @@ namespace Ceto
     /// <summary>
     /// The resolution settings for the ocean mesh.
     /// </summary>
-	public enum MESH_RESOLUTION {  LOW, MEDIUM, HIGH, ULTRA, EXTREME  };
+	public enum MESH_RESOLUTION {  MOBILE, LOW, MEDIUM, HIGH, ULTRA, EXTREME  };
 
 	/// <summary>
 	/// The number of meshes the projected grid is split into.

@@ -148,7 +148,8 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 
 	fixed3 col = fixed3(0, 0, 0);
 
-	col += sky * fresnel;
+	fixed distParam = lerp(0, 1.1, saturate(log2(dist) / 10));
+	col += sky * fresnel* distParam;
 
 	col += sea * (1.0 - fresnel);
 
@@ -165,7 +166,7 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 	o.Normal = TangentSpaceNormal(norm3);
 	o.DNormal = norm3;
 	o.Fresnel = fresnel;
-	o.Foam = foamAmount;
+	o.Foam = 0;
 	//o.Alpha = 0.8;
 	//o.LightMask = 0;
 }

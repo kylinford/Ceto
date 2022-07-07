@@ -9,7 +9,7 @@ public class WaveSpectrumCache : MonoBehaviour
 	/// <summary>
 	/// Tells if this component has finished start function
 	/// </summary>
-	public bool cachedEnough =>count >= 10;
+	public bool cachedEnough =>count >= CACHE_SIZE;
 	/// <summary>
 	/// Time interval used for maps array: displacement, slope, foam maps array.
 	/// </summary>
@@ -60,7 +60,8 @@ public class WaveSpectrumCache : MonoBehaviour
 		yield return new WaitUntil(() => waveSpectrum.M_Conditions != null);
 		CreateBuffers();
 		CreateRenderTextures();
-		GenerateAllMaps();
+		//GenerateAllMaps();
+		StartCoroutine(GenerateAllMapsEnumerator());
 		//LoadAllMapsFromResources();
 		//SaveAllMaps();
 		//Thread tdUpdateCache = new Thread(new ThreadStart(UpdateCaches));
@@ -68,6 +69,30 @@ public class WaveSpectrumCache : MonoBehaviour
 		//StartCoroutine(UpdateCacheEnumerator());
 	}
 
+
+	void GenerateAllMaps()
+	{
+		for (int i = 0; i < CACHE_SIZE; i++)
+		{
+			GenerateCurrMap();
+		}
+	}
+
+	private IEnumerator GenerateAllMapsEnumerator()
+	{
+		while(count < CACHE_SIZE)
+		{
+            for (int j = 0; j < 3; j++)
+            {
+				yield return new WaitForEndOfFrame();
+				GenerateCurrMap();
+				if (count >= CACHE_SIZE)
+                {
+					break;
+                }
+			}
+		}
+	}
 	/// <summary>
 	/// Generate curr map by count++. 
 	/// </summary>
@@ -84,14 +109,6 @@ public class WaveSpectrumCache : MonoBehaviour
 			GenerateFoamMaps(index, time);
 
 		count++;
-	}
-
-    void GenerateAllMaps()
-	{
-		for (int i = 0; i < CACHE_SIZE; i++)
-		{
-			GenerateCurrMap();
-		}
 	}
 
 	void LoadAllMapsFromResources()

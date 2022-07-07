@@ -24,12 +24,14 @@ namespace Ceto.Common.Unity.Utility
         void Update()
         {
             timeleft -= Time.deltaTime;
-            accum += Time.timeScale / Time.deltaTime;
+            //accum += Time.timeScale / Time.deltaTime;
+            accum += Time.deltaTime;
             ++frames;
 
             if (timeleft <= 0.0f)
             {
-				FrameRate = accum / frames;
+                //FrameRate = accum / frames;
+                FrameRate = frames / accum;
                 timeleft = updateInterval;
                 accum = 0;
                 frames = 0;

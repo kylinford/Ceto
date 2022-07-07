@@ -30,8 +30,8 @@ namespace Ceto
             while(true)
             {
                 yield return new WaitForSeconds(1);
-                //text.text = "FPS = " + m_fps.FrameRate.ToString("F2");
-                text.text = "FPS = " + (1f / Time.deltaTime).ToString("F2");
+                text.text = "FPS = " + m_fps.FrameRate.ToString("F2");
+                //text.text = "FPS = " + (1f / Time.deltaTime).ToString("F2");
             }
 
         }
