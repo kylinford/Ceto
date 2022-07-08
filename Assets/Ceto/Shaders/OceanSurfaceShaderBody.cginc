@@ -72,8 +72,8 @@ void OceanSurfTop_PureColor(Input IN, inout SurfaceOutputOcean o)
 	o.Normal = TangentSpaceNormal(half3(0, 1, 0));
 	o.DNormal = half3(0, 1, 0);
 	o.Fresnel = 1;
-	o.Foam = 1;
-	o.Alpha = 0.5;
+	o.Foam = 0;
+	o.Alpha = 1;
 	o.LightMask = 0;
 }
 
@@ -128,6 +128,10 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 #endif
 
 	fixed3 sky = ReflectionColor(norm2, screenUV.xy);
+	//fixed3 sky = fixed3(1, 1, 1);
+
+	fixed3 col = fixed3(0, 0, 0);
+	fixed fresnel = FresnelAirWater_Simplified(view, norm3);
 
 	float4 disortionUV = DisortScreenUV(norm2, screenUV, depth, dist, view);
 	//float4 disortionUV = screenUV;
@@ -143,15 +147,25 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 	//sea += SubSurfaceScatter(view, norm1, worldPos.y);
 
 	//fixed fresnel = FresnelAirWater(view, norm3);
-	fixed fresnel = FresnelAirWater_Simplified(view, norm3);
+	//fixed fresnel = FresnelAirWater_Simplified(view, norm3);
 	//fixed fresnel = 0.2;
 
-	fixed3 col = fixed3(0, 0, 0);
+	/*
+	if (dist > 500)
+	{
+		col += sky * max(fresnel, saturate((dist - 500) / 100));
+		col += sea * (1.0 - fresnel);
+	}
+	else
+	{
+		col += sky * fresnel;//*distParam;
 
-	fixed distParam = lerp(0, 1.1, saturate(log2(dist) / 10));
-	col += sky * fresnel* distParam;
-
+		col += sea * (1.0 - fresnel);
+	}*/
+	//fixed distParam = lerp(0, 1.1, saturate(log2(dist) / 10));
+	col += sky * fresnel;//*distParam;
 	col += sea * (1.0 - fresnel);
+
 
 	//foam
 	fixed foamAmount = FoamAmount(worldPos, foam);

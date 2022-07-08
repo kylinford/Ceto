@@ -829,7 +829,7 @@ namespace Ceto
 			}
 
 			//gridGroups = groups;
-
+			//Debug.Log(groupSize);
 			return groupSize;
 
 		}

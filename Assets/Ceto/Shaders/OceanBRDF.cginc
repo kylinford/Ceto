@@ -83,8 +83,31 @@ half Lambda(half cosTheta, half sigma)
 	return (exp(-v * v)) / (2.0 * v * M_SQRT_PI);
 }
 
+half ReflectedSunRadianceFast(half3 V, half3 N, half3 L, fixed fresnel)
+{
+	//return 0.5;
+
+
+	half3 H = normalize(L + V);
+
+	half hn = dot(H, N);
+	//half p = exp(-2.0 * ((1.0 - hn * hn) / Ceto_SpecularRoughness) / (1.0 + hn)) / (4.0 * M_PI * Ceto_SpecularRoughness);
+	half value = 2.0 * ((1.0 - hn * hn) / Ceto_SpecularRoughness) / (1.0 + hn);
+	half inverseValue = 1 / value;
+	half p = inverseValue / (4.0 * M_PI * Ceto_SpecularRoughness);
+	p = saturate(p);
+
+	half zL = dot(L, N);
+	half zV = dot(V, N);
+	zL = max(zL, 0.01);
+	zV = max(zV, 0.01);
+
+	return (L.y < 0 || zL <= 0.0) ? 0.0 : max(Ceto_SpecularIntensity * p * sqrt(abs(zL / zV)), 0.0);
+}
+
 half3 ReflectedSunRadianceNice(half3 V, half3 N, half3 L, fixed fresnel) 
 {
+	return ReflectedSunRadianceFast(V, N, L, fresnel);
 
 	half3 Ty = half3(0.0, N.z, -N.y);
 	half3 Tx = cross(Ty, N);
@@ -118,23 +141,10 @@ half3 ReflectedSunRadianceNice(half3 V, half3 N, half3 L, fixed fresnel)
 }
 
 
-half ReflectedSunRadianceFast(half3 V, half3 N, half3 L, fixed fresnel) 
-{
-
-    half3 H = normalize(L + V);
-
-    half hn = dot(H, N);
-    half p = exp(-2.0 * ((1.0 - hn * hn) / Ceto_SpecularRoughness) / (1.0 + hn)) / (4.0 * M_PI * Ceto_SpecularRoughness);
-
-    half zL = dot(L, N);
-    half zV = dot(V, N);
-    zL = max(zL,0.01);
-    zV = max(zV,0.01);
-
-    return (L.y < 0 || zL <= 0.0) ? 0.0 : max(Ceto_SpecularIntensity * p * sqrt(abs(zL / zV)), 0.0);
-}
 inline fixed4 OceanBRDFLight(SurfaceOutputOcean s, half3 viewDir, UnityLight light)
 {
+	//return fixed4(0.5, 0.5, 0.5, 1);
+	
 	fixed4 c = fixed4(0,0,0,1);
 	
 	half3 V = viewDir;
@@ -166,7 +176,7 @@ inline fixed4 OceanBRDFLight(SurfaceOutputOcean s, half3 viewDir, UnityLight lig
 
 		c.rgb = SpecNoDiffuse * a + SpecAndDiffuse * (1.0 - a);
 	#else
-		c.rgb = s.Albedo * light.color * diff + light.color * spec;
+	c.rgb = s.Albedo * light.color * diff;// +light.color * spec;
 	#endif
 	
 #else
@@ -176,9 +186,18 @@ inline fixed4 OceanBRDFLight(SurfaceOutputOcean s, half3 viewDir, UnityLight lig
 	fixed diff = max (0, dot (DN, light.dir));
 	
 	half nh = max (0, dot (N, h));
-	half spec = pow (nh, 128.0);
+	//half spec = pow (nh, 128.0);
+	half spec = nh;//1
+	spec *= spec;//2
+	spec *= spec;//4
+	spec *= spec;//8
+	spec *= spec;//16
+	spec *= spec;//32
+	spec *= spec;//64
+	spec *= spec;//128
 
-	c.rgb = s.Albedo * light.color * diff + light.color * spec;
+
+	c.rgb = s.Albedo * light.color * diff;// +light.color * spec;
 
 #endif
 
@@ -188,11 +207,12 @@ inline fixed4 OceanBRDFLight(SurfaceOutputOcean s, half3 viewDir, UnityLight lig
 
 inline fixed4 LightingOceanBRDF(SurfaceOutputOcean s, half3 viewDir, UnityGI gi)
 {
-
+	//return fixed4(0.5,0.5,0.5,1);
 	//return fixed4(s.Albedo,1);
 
 	fixed4 c = OceanBRDFLight (s, viewDir, gi.light);
-
+	//fixed4 c = gi.light.color;
+	//fixed4 c = fixed4(0.6, 0.6, 0.6, 1);
 
 	#ifdef UNITY_LIGHT_FUNCTION_APPLY_INDIRECT
 		#ifndef CETO_DISABLE_NO_DIFFUSE_IN_REFLECTION
