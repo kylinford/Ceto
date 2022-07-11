@@ -591,7 +591,7 @@ MonoBehaviour:
   ignoreQuerys: 0
   textureFoam: 1
   heightSpread: 10
-  foamSpread: 2
+  foamSpread: 1
   clipOffset: 4
   resolution: 128
   useHeightMask: 1
@@ -599,7 +599,7 @@ MonoBehaviour:
   useNormalMask: 1
   normalAlpha: 0.6
   useEdgeFoam: 1
-  edgeFoamAlpha: 1
+  edgeFoamAlpha: 0.5
   useFoamMask: 1
   foamMaskAlpha: 1
   useClipMask: 1
@@ -734,7 +734,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: fourierSize
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: textureFoam
@@ -743,10 +743,6 @@ PrefabInstance:
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: windSpeed
       value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
-      propertyPath: foamAmount
-      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: gridScale
@@ -771,6 +767,14 @@ PrefabInstance:
     - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: disableDisplacements
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: foamAmount
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400362, guid: a0cc482d2da03784692568b56c77c234, type: 3}
+      propertyPath: choppyness
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11414226, guid: a0cc482d2da03784692568b56c77c234, type: 3}
       propertyPath: underwaterMode
@@ -1310,12 +1314,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1919763646}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aefe72c6867c927479302918fd254719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetFPS: 60
+  targetFPS: 30
 --- !u!1 &2112276701
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,7 +1331,6 @@ GameObject:
   - component: {fileID: 2112276705}
   - component: {fileID: 2112276704}
   - component: {fileID: 2112276703}
-  - component: {fileID: 2112276702}
   m_Layer: 8
   m_Name: Terrain (1)
   m_TagString: Untagged
@@ -1335,33 +1338,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!114 &2112276702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2112276701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a916e5193edd6640bd918eff18d31c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoreQuerys: 0
-  textureFoam: 1
-  heightSpread: 10
-  foamSpread: 2
-  clipOffset: 4
-  resolution: 128
-  useHeightMask: 1
-  heightAlpha: 0.9
-  useNormalMask: 1
-  normalAlpha: 0.6
-  useEdgeFoam: 1
-  edgeFoamAlpha: 1
-  useFoamMask: 1
-  foamMaskAlpha: 1
-  useClipMask: 1
 --- !u!154 &2112276703
 TerrainCollider:
   m_ObjectHideFlags: 0

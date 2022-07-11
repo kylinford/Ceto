@@ -19,7 +19,7 @@ fixed FoamAmount(float3 worldPos, fixed4 foam)
    		foamTexture += tex2D(Ceto_FoamTexture0, (worldPos.xz + Ceto_FoamTextureScale0.z) * Ceto_FoamTextureScale0.xy).a * 0.5;
 		foamTexture += tex2D(Ceto_FoamTexture1, (worldPos.xz + Ceto_FoamTextureScale1.z) * Ceto_FoamTextureScale1.xy).a * 0.5;
 	#else
-		foamTexture = 1.0;
+	foamTexture = 1.0;
 	#endif
 	
 
@@ -518,9 +518,9 @@ fixed3 ApplyEdgeFade(fixed3 col, float2 grabUV, float edgeFade, out fixed alpha,
 */
 fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfacePos, float3 distortedWorldDepthPos, float dist)
 {
-
 	fixed3 col = fixed3(0, 0, 0);
-	if (surfacePos.y - distortedWorldDepthPos.y > 15 || dist > 300)
+	float distFade = 1.0 - saturate(dist * 0.001);
+	if (surfacePos.y - distortedWorldDepthPos.y > 15 || distFade < 0.8)
 	{
 		return col;
 	}
@@ -548,7 +548,7 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 	//The dist fade fades the caustics the higher the camera is above the ocean.
 	//This reduces aliasing issues and in forward mode the DepthNormal texture
 	//gets noisey when far away from a object causing noise in the normal fade texture.
-	float distFade = 1.0 - saturate(dist * 0.001);
+	//float distFade = 1.0 - saturate(dist * 0.001);
 	//float distFade = saturate(1 / log2(dist));
 
 	col = caustic * Ceto_CausticTint * nf * distFade * depthFade;

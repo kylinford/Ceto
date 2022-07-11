@@ -21,7 +21,7 @@ Shader "Ceto/OceanUnderSide_Transparent"
 		CGPROGRAM
 		#pragma surface OceanSurfUnder OceanBRDF noforwardadd nolightmap keepalpha
 		#pragma vertex OceanVert
-		#pragma target 3.0
+		#pragma target 3.5
 		
 		#pragma multi_compile __ CETO_REFLECTION_ON
 		#pragma multi_compile __ CETO_UNDERWATER_ON

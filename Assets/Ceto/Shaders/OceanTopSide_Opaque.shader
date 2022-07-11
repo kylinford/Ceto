@@ -21,7 +21,7 @@ Shader "Ceto/OceanTopSide_Opaque"
 		#pragma surface OceanSurfTop OceanBRDF noforwardadd nolightmap
 		//#pragma surface OceanSurfTop OceanBRDF nolightmap fullforwardshadows
 		#pragma vertex OceanVert
-		#pragma target 3.0
+		#pragma target 3.5
 		
 		#pragma multi_compile __ CETO_REFLECTION_ON
 		#pragma multi_compile __ CETO_UNDERWATER_ON

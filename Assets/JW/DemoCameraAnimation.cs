@@ -4,16 +4,41 @@ using UnityEngine;
 
 public class DemoCameraAnimation : MonoBehaviour
 {
+    private Vector3 startPos;
+    private Quaternion startRotation;
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(AnimationEnumerator());
+        startPos = transform.position;
+        startRotation = transform.rotation;
+        //StartCoroutine(AnimationEnumeratorLoop());
 
     }
 
+    private void Update()
+    {
+        if(Input.GetMouseButtonUp(0))
+        {
+            StopAllCoroutines();
+            StartCoroutine(AnimationEnumerator());
+        }
+    }
+
+    private IEnumerator AnimationEnumeratorLoop()
+    {
+        while (true)
+        {
+
+            yield return new WaitForSeconds(2);
+            yield return AnimationEnumerator();
+            yield return new WaitForSeconds(10);
+        }
+    }
 
     private IEnumerator AnimationEnumerator()
     {
+        transform.position = startPos;
+        transform.rotation = startRotation;
         yield return RotateEnumerator(new Vector3(0, -12, 0), 5);
         yield return new WaitForSeconds(1);
         StartCoroutine(RotateEnumerator(new Vector3(7, 0, 0), 13));
