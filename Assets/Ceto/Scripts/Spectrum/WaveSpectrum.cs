@@ -769,7 +769,7 @@ namespace Ceto
 					{
 						Shader.SetGlobalTexture("Ceto_DisplacementMap0", Texture2D.blackTexture);
 					}
-
+					/*
 					//COPY GRIDS 2
 					if (numGrids > 1)
 					{
@@ -786,7 +786,7 @@ namespace Ceto
 					//COPY GRIDS 3
 					if (numGrids > 2)
 					{
-						Graphics.Blit(null, m_displacementMaps[2], m_displacementCopyMat, 2);
+						//Graphics.Blit(null, m_displacementMaps[2], m_displacementCopyMat, 2);
 						Shader.SetGlobalTexture("Ceto_DisplacementMap2", m_displacementMaps[2]);
 					}
 					else
@@ -797,14 +797,14 @@ namespace Ceto
 					//COPY GRIDS 4
 					if (numGrids > 3)
 					{
-						Graphics.Blit(null, m_displacementMaps[3], m_displacementCopyMat, 3);
+						//Graphics.Blit(null, m_displacementMaps[3], m_displacementCopyMat, 3);
 						Shader.SetGlobalTexture("Ceto_DisplacementMap3", m_displacementMaps[3]);
 					}
 					else
 					{
 						Shader.SetGlobalTexture("Ceto_DisplacementMap3", Texture2D.blackTexture);
 					}
-
+					*/
 					m_displacementBuffer.DisableSampling();
 					m_displacementBuffer.BeenSampled = true;
 

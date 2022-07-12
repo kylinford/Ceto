@@ -39,10 +39,13 @@ public class DemoCameraAnimation : MonoBehaviour
     {
         transform.position = startPos;
         transform.rotation = startRotation;
-        yield return RotateEnumerator(new Vector3(0, -12, 0), 5);
+        yield return new WaitForSeconds(4);
+        yield return RotateEnumerator(new Vector3(0, 45, 0), 7);
         yield return new WaitForSeconds(1);
-        StartCoroutine(RotateEnumerator(new Vector3(7, 0, 0), 13));
-        yield return TranslateEnumerator(transform.forward * 140 + new Vector3(0, 25, 0), 13);
+        //StartCoroutine(RotateEnumerator(new Vector3(7, 0, 0), 13));
+        Vector3 forwardNoY = transform.forward;
+        forwardNoY.y = 0;
+        yield return TranslateEnumerator(forwardNoY * 80, 13);
     }
 
     private IEnumerator RotateEnumerator(Vector3 angle, float timer)

@@ -168,28 +168,37 @@ void OceanSurfTop_Dev(Input IN, inout SurfaceOutputOcean o)
 
 	float3 worldDepthPos = WorldDepthPos(disortionUV.xy);
 
-	fixed3 caustics = CausticsFromAbove(disortionUV.xy, unmaskedNorm, worldPos, worldDepthPos, dist);
-	//fixed3 caustics = fixed3(0, 0, 0);
+	//fixed3 caustics = CausticsFromAbove(disortionUV.xy, unmaskedNorm, worldPos, worldDepthPos, dist);
+	fixed3 caustics = fixed3(0, 0, 0);
+	
+	float distFade = 1.0 - saturate(dist * 0.001);
+		//fixed cut = step(15, surfacePos.y - distortedWorldDepthPos.y);
+	if (worldPos.y - worldDepthPos.y < 15)// || distFade < 0.9)
+	{
+		#ifdef CETO_UNDERWATER_ON
+		#ifndef CETO_USE_OCEAN_DEPTHS_BUFFER
+		#ifndef CETO_DISABLE_CAUSTICS
+		float2 uvCaustic = worldDepthPos.xz * Ceto_CausticTextureScale.xy + unmaskedNorm.xz * Ceto_CausticDistortion.x;
+		float depthFadeScale = Ceto_CausticTextureScale.w * Ceto_CausticTextureScale.w;
+		float depthFade = clamp(1 / max(0.0, worldPos.y - worldDepthPos.y) * 1000 * depthFadeScale, 0, 1);
+		fixed3 causticTex = tex2D(Ceto_CausticTexture, uvCaustic);
+		float nf = 1;
+		caustics = causticTex * Ceto_CausticTint * nf * distFade * depthFade;
+		#endif
+		#endif
+		#endif
+	}
 
 	fixed3 sea = OceanColorFromAbove(disortionUV, worldPos, depth, caustics);
 	//fixed3 sea = Ceto_DefaultOceanColor;
 
-	//sea += SubSurfaceScatter(view, norm1, worldPos.y);
+	sea += SubSurfaceScatter(view, norm1, worldPos.y);
 
 	col += sky * fresnel;
 	col += sea * (1.0 - fresnel);
 
 	//foam
-	//fixed foamAmount = FoamAmount(worldPos, foam);
-	//fixed foamAmount = foam.y;
-	//fixed foamAmount = 0;
-	//col = AddFoamColor(foamAmount, col);
-	//fixed foamAmount = max(foam.x, foam.y);
-	//foamAmount *= step(0.8, foamAmount);
-	fixed foamAmount = foam.y;
-	//float a = step(0.5, foamAmount.r);
-	//fragColor = a * colorA + (1.0 - b) * colorB + b * c * mix(colorB, colorA, smoothstep(0.0, 1.0, projColor.r));
-
+	fixed foamAmount = foam.y;//max(foam.x, foam.y);
 	col = lerp(col, fixed3(1, 1, 1), foamAmount);
 
 	//edge fade

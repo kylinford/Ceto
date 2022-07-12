@@ -395,7 +395,8 @@ fixed3 OceanColorFromAbove(float4 distortedUV, float3 surfacePos, float surfaceD
 {
 
 	fixed3 col = Ceto_DefaultOceanColor;
-
+	//col = Ceto_AboveInscatterColor.rgb;
+	/*
 	#ifdef CETO_UNDERWATER_ON
 		
 		float2 oceanDepth = OceanDepth(distortedUV.xy, surfacePos, surfaceDepth);
@@ -408,6 +409,61 @@ fixed3 OceanColorFromAbove(float4 distortedUV, float3 surfacePos, float surfaceD
 
 	#endif
 	
+	return col;
+	*/
+#ifdef CETO_UNDERWATER_ON
+	//oceanDepth
+	float2 sd;
+	sd.x = (surfacePos.y - Ceto_OceanLevel) * -1.0;
+	sd.y = surfaceDepth * _ProjectionParams.z / Ceto_MaxDepthDist;
+	#ifdef CETO_USE_OCEAN_DEPTHS_BUFFER
+	float2 oceanDepth = SampleOceanDepth(distortedUV.xy).xy;
+	#else
+	float2 oceanDepth = SampleOceanDepthFromDepthBuffer(distortedUV.xy).xy;
+	#endif
+	oceanDepth.x = max(0.0, oceanDepth.x - sd.x) / Ceto_MaxDepthDist;
+	oceanDepth.y = max(0.0, oceanDepth.y - sd.y);
+
+	//depthBlend
+	float depthBlend = lerp(oceanDepth.x, oceanDepth.y, Ceto_DepthBlend);
+
+	//refraction
+	fixed3 grab = tex2D(Ceto_RefractionGrab, distortedUV.zw).rgb * Ceto_AboveRefractionIntensity;
+	grab += caustics;
+	//fixed3 col = grab * Ceto_AbsTint * exp(-Ceto_AbsCof.rgb * depth * Ceto_MaxDepthDist * Ceto_AbsCof.a);
+	fixed3 inverse = 0.7 / (Ceto_AbsCof.rgb * depthBlend * Ceto_MaxDepthDist * Ceto_AbsCof.a);
+	inverse = saturate(inverse);
+	fixed3 refraction = grab * Ceto_AbsTint * inverse;
+
+	//AddAboveInscatter
+	col = AddAboveInscatter(refraction, depthBlend);
+	//There are 3 methods used to apply the inscatter.
+	half3 inscatterScale;
+	inscatterScale.x = saturate(depthBlend * Ceto_AboveInscatterScale);
+	//inscatterScale.y = saturate(1.0-exp(-depth * Ceto_AboveInscatterScale));
+	half inverseY = min(0.7, 0.6 / (depthBlend * Ceto_AboveInscatterScale));
+	inscatterScale.y = saturate(1.0 - inverseY);
+	//inscatterScale.z = saturate(1.0-exp(-depth  * Ceto_AboveInscatterScale));
+	inscatterScale.z = inscatterScale.y;
+	//Apply mask to pick which methods result to use.
+	half a = dot(inscatterScale, Ceto_AboveInscatterMode);
+	col = lerp(refraction, Ceto_AboveInscatterColor.rgb, a * Ceto_AboveInscatterColor.a);
+
+	/*
+	//There are 3 methods used to apply the inscatter.
+	half3 inscatterScale;
+	inscatterScale.x = saturate(depthBlend * Ceto_AboveInscatterScale);
+	//inscatterScale.y = saturate(1.0-exp(-depth * Ceto_AboveInscatterScale));
+	half inverseY = min(0.7, 0.6 / (depthBlend * Ceto_AboveInscatterScale));
+	inscatterScale.y = saturate(1.0 - inverseY);
+	//inscatterScale.z = saturate(1.0-exp(-depth  * Ceto_AboveInscatterScale));
+	inscatterScale.z = inscatterScale.y;
+	//Apply mask to pick which methods result to use.
+	half a = dot(inscatterScale, Ceto_AboveInscatterMode);
+	col = lerp(col, Ceto_AboveInscatterColor.rgb, a * Ceto_AboveInscatterColor.a);
+	*/
+#endif
+
 	return col;
 	
 }
@@ -520,7 +576,7 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 {
 	fixed3 col = fixed3(0, 0, 0);
 	float distFade = 1.0 - saturate(dist * 0.001);
-	if (surfacePos.y - distortedWorldDepthPos.y > 15 || distFade < 0.8)
+	if (surfacePos.y - distortedWorldDepthPos.y > 15)// || distFade < 0.9)
 	{
 		return col;
 	}
@@ -529,21 +585,24 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 	#ifndef CETO_USE_OCEAN_DEPTHS_BUFFER
 	#ifndef CETO_DISABLE_CAUSTICS
 
-	float2 uv = distortedWorldDepthPos.xz * Ceto_CausticTextureScale.xy + unmaskedNorm.xz * Ceto_CausticDistortion.x;
+	float2 uv = distortedWorldDepthPos.xz * Ceto_CausticTextureScale.xy+unmaskedNorm.xz * Ceto_CausticDistortion.x;
+	//float2 uv = disortionUV;
 
 	//Depth fade fades the caustics the deeper the object is in the ocean.
 	float depthFadeScale = Ceto_CausticTextureScale.w * Ceto_CausticTextureScale.w;
 	
 	//float depthFade = exp(-max(0.0, surfacePos.y - distortedWorldDepthPos.y) * depthFadeScale);
-	float factor = 1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 1000;
+	//float factor = 1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 1000;
 	//factor = clamp(factor, 0, 1000);
-	float depthFade = factor * depthFadeScale;
-	depthFade = clamp(factor, 0, 3);
+	float depthFade = clamp(1 / max(0.0, surfacePos.y - distortedWorldDepthPos.y) * 1000 * depthFadeScale, 0, 1);
+	//depthFade = clamp(factor, 0, 3);
+	//depthFade = clamp(factor, 0, 1);
 
 	fixed3 caustic = tex2D(Ceto_CausticTexture, uv);
 
 	//Normal fade makes the caustics only appear on top of opjects.
-	float nf = tex2D(Ceto_NormalFade, disortionUV).x;
+	//float nf = tex2D(Ceto_NormalFade, disortionUV).x;
+	float nf = 1;
 
 	//The dist fade fades the caustics the higher the camera is above the ocean.
 	//This reduces aliasing issues and in forward mode the DepthNormal texture
@@ -552,6 +611,7 @@ fixed3 CausticsFromAbove(float2 disortionUV, half3 unmaskedNorm, float3 surfaceP
 	//float distFade = saturate(1 / log2(dist));
 
 	col = caustic * Ceto_CausticTint * nf * distFade * depthFade;
+	//col = caustic * Ceto_CausticTint * nf * depthFade;
 
 	#endif
 	#endif

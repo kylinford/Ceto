@@ -162,7 +162,7 @@ float3 SampleDisplacement(float2 uv, float2 dux, float2 duy)
 			d = tex2DGrad(Ceto_DisplacementMap0, uv * igridSizes.x, dux * igridSizes.x, duy * igridSizes.x).xyz;
 			d.xz *= Ceto_Choppyness.x;
 			h += d;
-	
+	/*
 			d = tex2DGrad(Ceto_DisplacementMap1, uv * igridSizes.y, dux * igridSizes.y, duy * igridSizes.y).xyz;
 			d.xz *= Ceto_Choppyness.y;
 			h += d;
@@ -178,6 +178,7 @@ float3 SampleDisplacement(float2 uv, float2 dux, float2 duy)
 				h += d;
 			#endif
 		#endif
+				*/
 		
 		#endif
 	#endif
